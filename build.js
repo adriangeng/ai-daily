@@ -5,6 +5,9 @@ const path = require('path');
 const ROOT = __dirname;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
+// 渲染模式：node build.js --render 时跳过联网拉取，直接用已落盘的 raw 文件（供 enrich 之后二次渲染）
+const RENDER_ONLY = process.argv.includes('--render');
+
 // ---- 自动拉取数据（失败则回退到本地缓存文件） ----
 async function fetchJSON(url, timeout = 12000) {
   const ctrl = new AbortController();
@@ -17,6 +20,9 @@ async function fetchJSON(url, timeout = 12000) {
   } finally { clearTimeout(to); }
 }
 async function loadDaily() {
+  if (RENDER_ONLY && fs.existsSync(path.join(ROOT, 'daily_raw.json'))) {
+    return JSON.parse(fs.readFileSync(path.join(ROOT, 'daily_raw.json'), 'utf8'));
+  }
   try {
     const d = await fetchJSON('https://aihot.virxact.com/api/public/daily');
     fs.writeFileSync(path.join(ROOT, 'daily_raw.json'), JSON.stringify(d, null, 0));
@@ -27,6 +33,9 @@ async function loadDaily() {
   }
 }
 async function loadItems() {
+  if (RENDER_ONLY && fs.existsSync(path.join(ROOT, 'items_raw.json'))) {
+    return JSON.parse(fs.readFileSync(path.join(ROOT, 'items_raw.json'), 'utf8'));
+  }
   try {
     const d = await fetchJSON('https://aihot.virxact.com/api/public/items?mode=selected&take=100');
     fs.writeFileSync(path.join(ROOT, 'items_raw.json'), JSON.stringify(d, null, 0));
@@ -37,13 +46,13 @@ async function loadItems() {
   }
 }
 
-// ---- canonical 5 sections (fixed order) ----
-const CANON = [
-  { key: 'ai-models', label: '模型发布/更新' },
-  { key: 'ai-products', label: '产品发布/更新' },
-  { key: 'industry', label: '行业动态' },
-  { key: 'paper', label: '论文研究' },
-  { key: 'tip', label: '技巧与观点' },
+// ---- source section labels (from aihot daily) ----
+const CANON_LABELS = ['模型发布/更新', '产品发布/更新', '行业动态', '论文研究', '技巧与观点'];
+// ---- 4 展示模块：合并 5 个原始版块 ----
+const MODULES = [
+  { key: 'model-product', label: '模型 & 产品', secs: ['模型发布/更新', '产品发布/更新'] },
+  { key: 'industry-paper', label: '行业 & 论文', secs: ['行业动态', '论文研究'] },
+  { key: 'tips', label: '技巧与观点', secs: ['技巧与观点'] },
 ];
 
 // ---- build title -> publishedAt lookup from items feed (for Beijing time) ----
@@ -90,6 +99,22 @@ const SECTION_COMMENTS = {
   '论文研究':
     '今日无顶会级论文进简报，不是没人发，而是能被社区挑出来、值得精读的还没冒头——热闹在产线，不在 arXiv。',
 };
+
+// ---- 读取 AI 增强产物（enrich.js 生成；缺失时规则降级） ----
+let ENR = null;
+try { ENR = JSON.parse(fs.readFileSync(path.join(ROOT, 'ai_daily_enriched.json'), 'utf8')); } catch (e) {}
+function expSummary(title, fallback) {
+  if (ENR && Array.isArray(ENR.expanded)) {
+    const t = norm(title);
+    const hit = ENR.expanded.find((x) => norm(x.title) === t);
+    if (hit && hit.summary) return hit.summary;
+  }
+  return fallback;
+}
+function modReview(key) {
+  if (ENR && ENR.moduleReviews && ENR.moduleReviews[key]) return ENR.moduleReviews[key];
+  return '';
+}
 
 // ---- AI-related stock quotes (snapshot at build time, via Tencent 自选股) ----
 const MKT = {
@@ -190,28 +215,35 @@ async function fetchQuote(def) {
   const bjToday = bjDateStr(new Date());
   const isToday = daily.date === bjToday;
 
-  // ---- assemble ALL 5 canonical sections (global numbering, empty flagged) ----
-  const sections = [];
+  // ---- assemble 4 展示模块（合并 5 原始版块，全局编号连续） ----
+  const modules = [];
   let globalN = 0;
   const byLabel = {};
   for (const sec of (daily.sections || [])) byLabel[sec.label] = sec;
 
-  for (const c of CANON) {
-    const sec = byLabel[c.label];
-    const rawItems = (sec && sec.items) || [];
-    const items = rawItems.map((it) => {
-      globalN += 1;
-      return {
-        n: globalN,
-        title: it.title || '(无标题)',
-        summary: truncate(it.summary, 60),
-        sourceName: it.sourceName || it.source || '未知来源',
-        sourceUrl: it.sourceUrl || it.url || '#',
-        publishedAt: pubMap.get(norm(it.title)) || null,
-        comment: COMMENTS[norm(it.title)] || '',
-      };
+  for (const m of MODULES) {
+    const items = [];
+    for (const lab of m.secs) {
+      const sec = byLabel[lab];
+      const rawItems = (sec && sec.items) || [];
+      for (const it of rawItems) {
+        globalN += 1;
+        items.push({
+          n: globalN,
+          title: it.title || '(无标题)',
+          summary: expSummary(it.title, truncate(it.summary, 60)),
+          sourceName: it.sourceName || it.source || '未知来源',
+          sourceUrl: it.sourceUrl || it.url || '#',
+          publishedAt: pubMap.get(norm(it.title)) || null,
+          comment: COMMENTS[norm(it.title)] || '',
+        });
+      }
+    }
+    modules.push({
+      key: m.key, label: m.label,
+      items, empty: items.length === 0,
+      review: modReview(m.key),
     });
-    sections.push({ label: c.label, items, empty: items.length === 0, comment: SECTION_COMMENTS[c.label] || '' });
   }
 
   // ---- flashes (bonus, continue global numbering) ----
@@ -228,11 +260,9 @@ async function fetchQuote(def) {
   });
 
   const total = globalN;
-  const matchedTime = sections.reduce((a, s) => a + s.items.filter((i) => i.publishedAt).length, 0);
-  const sectionStats = CANON.map((c) => {
-    const s = sections.find((x) => x.label === c.label);
-    return { label: c.label, count: s ? s.items.length : 0 };
-  });
+  const matchedTime = modules.reduce((a, s) => a + s.items.filter((i) => i.publishedAt).length, 0);
+  const moduleStats = modules.map((m) => ({ label: m.label, count: m.items.length }));
+  moduleStats.push({ label: 'AI 概念股', count: STOCK_DEFS.length });
 
   // ---- stocks ----
   let stocks = [];
@@ -245,12 +275,13 @@ async function fetchQuote(def) {
     date: daily.date,
     isToday,
     generatedAt: daily.generatedAt || null,
-    lead: LEAD,
+    lead: (ENR && ENR.leadText) ? ENR.leadText : LEAD,
+    bubbleComment: (ENR && ENR.bubbleComment) ? ENR.bubbleComment : '',
     leadTitle: daily.lead && daily.lead.title ? daily.lead.title : null,
-    sections,
+    modules,
     flashes,
     total,
-    sectionStats,
+    moduleStats,
     source: 'aihot.virxact.com',
     stocks,
     stockSource: '腾讯自选股',
@@ -284,7 +315,7 @@ async function fetchQuote(def) {
 
   // 写聚合摘要（供推送脚本使用，轻量、不含完整 HTML）
   fs.writeFileSync(path.join(ROOT, 'ai_daily_summary.json'), JSON.stringify({
-    date: daily.date, isToday, total, sectionStats,
+    date: daily.date, isToday, total, moduleStats,
     stocks: stocks.map((q) => ({
       t: q.t, name: q.name, mkt: q.mktLabel, price: q.price,
       change: q.change, changePct: q.changePct, currency: q.currency, bjTime: q.bjTime,
@@ -326,7 +357,7 @@ ${css}
       <div class="stats" id="stats"></div>
       <div class="total">
         <span class="big" id="totalNum">0</span>
-        <span class="t">条 AI 动态 · 五版块全覆盖</span>
+        <span class="t">条 AI 动态 · 四模块全覆盖</span>
       </div>
     </div>
   </header>
@@ -379,6 +410,8 @@ const DESKTOP_CSS = `  :root{
   .leadbox{margin-top:18px;background:rgba(255,255,255,.12);border-left:4px solid #fff;
     border-radius:10px;padding:14px 18px;font-size:14.5px;line-height:1.75;max-width:840px}
   .leadbox .lt{font-size:12px;letter-spacing:2px;opacity:.8;text-transform:uppercase;margin-bottom:6px;display:block}
+  .bubble{margin-top:13px;border-top:1px dashed rgba(255,255,255,.4);padding-top:11px;font-size:13.5px;line-height:1.75}
+  .bubble .bl{font-weight:800;display:block;margin-bottom:5px;opacity:.96}
   .stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
   .stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
     border-radius:14px;padding:12px 16px;min-width:120px}
@@ -500,6 +533,8 @@ const MOBILE_CSS = `  :root{
   .leadbox{margin-top:14px;background:rgba(255,255,255,.13);border-left:4px solid #fff;
     border-radius:9px;padding:12px 14px;font-size:14px;line-height:1.7}
   .leadbox .lt{font-size:11px;letter-spacing:1.5px;opacity:.8;display:block;margin-bottom:5px}
+  .bubble{margin-top:11px;border-top:1px dashed rgba(255,255,255,.4);padding-top:10px;font-size:13.5px;line-height:1.7}
+  .bubble .bl{font-weight:800;display:block;margin-bottom:4px;opacity:.96}
   .stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
   .stat{flex:1 1 28%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
     border-radius:12px;padding:10px 12px;min-width:0}
