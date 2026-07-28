@@ -30,8 +30,18 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Build daily report
+      - name: Build daily report (fetch + render v1)
         run: node build.js
+
+      - name: AI enrich (LLM 长摘要 + 模块辣评 + 泡沫导语)
+        continue-on-error: true
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+        run: node enrich.js
+
+      - name: Render final with enrich (v2)
+        run: node build.js --render
 
       - name: Assemble site
         run: |
@@ -64,13 +74,6 @@ jobs:
             curl -s "https://purge.jsdelivr.net/gh/adriangeng/ai-daily@main/$f" > /dev/null || true
           done
           echo "jsDelivr cache purged"
-
-      - name: AI enrich (LLM 一句话点评)
-        continue-on-error: true
-        env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_MODEL: ${{ secrets.LLM_MODEL }}
-        run: node enrich.js
 
       - name: Push WeChat notification
         continue-on-error: true
