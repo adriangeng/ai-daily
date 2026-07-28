@@ -1,7 +1,9 @@
-// enrich.js —— 调用云端 LLM 生成「AI 一句话点评」（新建文件，不修改原四件套）
-// 读取 items_raw.json（文章标题/摘要/分类/热度）+ ai_daily_summary.json（股票）
-// 输出 ai_daily_enriched.json，供 notify.js 融合进微信推送
-// 无 LLM_API_KEY 时优雅跳过（continue-on-error 兜底）
+// enrich.js —— 调用云端 LLM 生成增强内容（新建文件，不修改原四件套）
+// 读取 daily_raw.json（当日资讯，与 build.js 渲染顺序一致）+ ai_daily_summary.json（股票）
+// 输出 ai_daily_enriched.json，供 build.js（网页）与 notify.js（微信）消费
+// 生成内容：①每条新闻 120-160 字扩写摘要 ②4 模块各 50-100 字辣评
+//          ③AI 泡沫导语段 80-140 字 ④动态今日导读 ⑤头条/精选/盘面点评（供微信）
+// 无 LLM_API_KEY 时优雅跳过（continue-on-error 兜底，网页走规则降级版）
 const fs = require('fs');
 const path = require('path');
 const ROOT = __dirname;
@@ -9,77 +11,132 @@ const ROOT = __dirname;
 const API_KEY = process.env.LLM_API_KEY;
 const MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
 if (!API_KEY) {
-  console.log('[enrich] 未配置 LLM_API_KEY，跳过 AI 点评（推送将使用规则优化版）');
+  console.log('[enrich] 未配置 LLM_API_KEY，跳过 AI 增强（网页/推送将使用规则版）');
   process.exit(0);
 }
 
-const itemsRawPath = path.join(ROOT, 'items_raw.json');
+const dailyPath = path.join(ROOT, 'daily_raw.json');
 const sumPath = path.join(ROOT, 'ai_daily_summary.json');
-if (!fs.existsSync(itemsRawPath) || !fs.existsSync(sumPath)) {
-  console.error('[enrich] 缺少 items_raw.json 或 ai_daily_summary.json');
+if (!fs.existsSync(dailyPath) || !fs.existsSync(sumPath)) {
+  console.error('[enrich] 缺少 daily_raw.json 或 ai_daily_summary.json');
   process.exit(1);
 }
-const itemsRaw = JSON.parse(fs.readFileSync(itemsRawPath, 'utf8'));
+const daily = JSON.parse(fs.readFileSync(dailyPath, 'utf8'));
 const sum = JSON.parse(fs.readFileSync(sumPath, 'utf8'));
 
-// 取 selected 且热度较高的文章（最多 12 条喂给模型，控制 token）
-const items = (itemsRaw.items || [])
-  .filter((i) => i.selected !== false)
-  .sort((a, b) => (b.score || 0) - (a.score || 0))
-  .slice(0, 12)
-  .map((i) => ({ title: i.title, category: i.category, summary: i.summary || '', score: i.score || 0 }));
+const CANON_LABELS = ['模型发布/更新', '产品发布/更新', '行业动态', '论文研究', '技巧与观点'];
+const MODULES = [
+  { key: 'model-product', label: '模型 & 产品', secs: ['模型发布/更新', '产品发布/更新'] },
+  { key: 'industry-paper', label: '行业 & 论文', secs: ['行业动态', '论文研究'] },
+  { key: 'tips', label: '技巧与观点', secs: ['技巧与观点'] },
+];
 
-const stocks = sum.stocks.map((s) => ({ name: s.name, mkt: s.mkt, changePct: +s.changePct.toFixed(2) }));
+const byLabel = {};
+for (const sec of (daily.sections || [])) byLabel[sec.label] = sec;
 
-const sysPrompt =
+// 收集待扩写条目（与 build.js 渲染顺序一致：5 版块 + 快讯）
+const expandItems = [];
+for (const lab of CANON_LABELS) {
+  const sec = byLabel[lab];
+  for (const it of ((sec && sec.items) || [])) {
+    expandItems.push({ title: it.title || '', summary: it.summary || '' });
+  }
+}
+for (const f of (daily.flashes || [])) {
+  expandItems.push({ title: f.title || '', summary: f.summary || '' });
+}
+
+const stocks = (sum.stocks || []).map((s) => ({
+  name: s.name, mkt: s.mkt, changePct: +(s.changePct || 0).toFixed(2),
+}));
+
+function stripJSON(txt) {
+  const m = txt.match(/\{[\s\S]*\}/);
+  return m ? m[0] : txt;
+}
+async function callLLM(system, user, maxTokens) {
+  const r = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + API_KEY },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      temperature: 0.7,
+      max_tokens: maxTokens,
+      response_format: { type: 'json_object' },
+    }),
+  });
+  const j = await r.json();
+  if (j.error) {
+    console.error('[enrich] API error:', JSON.stringify(j.error));
+    process.exit(1);
+  }
+  const txt = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+  return JSON.parse(stripJSON(txt));
+}
+
+// ---- Call 1：扩写每条新闻摘要至 120-160 字 ----
+const sys1 =
+  '你是中文 AI 资讯编辑。只输出合法 JSON，不要任何解释，不要用 markdown 代码块包裹。' +
+  '为每条新闻把过短的摘要扩写成信息量充足的段落。';
+const user1 =
+  `今天是 ${sum.date}。请为下面每条新闻把「原摘要」扩写到 120–160 字（中文），补全背景、影响与看点，保持客观，不要编造原文未提及的具体数字或结论。严格按输入顺序逐条返回，不要遗漏、不要合并。每条输出的 title 必须与输入「标题」完全一致（含标点）。\n\n` +
+  expandItems.map((it, i) => `${i + 1}. 标题:${it.title}\n   原摘要:${it.summary}`).join('\n') +
+  `\n\n请输出 JSON：\n{ "expanded": [ {"title":"原标题（须与输入一致）","summary":"扩写后的120-160字摘要"}, ... ] }`;
+
+// ---- Call 2：模块辣评 + 泡沫导语 + 动态导读 + 微信头条/精选 ----
+const moduleCtx = MODULES.map((m) => {
+  const titles = [];
+  for (const lab of m.secs) {
+    const sec = byLabel[lab];
+    for (const it of ((sec && sec.items) || [])) titles.push(it.title);
+  }
+  return { key: m.key, label: m.label, titles };
+});
+const sys2 =
   '你是资深 AI 行业编辑，为关注 AI 与资本市场的中国读者写每日速评。' +
-  '要求：1) 只输出合法 JSON，不要任何解释或 markdown 代码块包裹；' +
-  '2) 中文、简洁、有独立判断，敢给观点，不堆砌；3) 每条点评不超过 40 字。';
-
-const userPrompt =
-  `今天是 ${sum.date}。以下是当日 AI HOT 精选资讯与 AI 概念股涨跌：\n\n` +
-  `【资讯】\n` +
-  items.map((i, idx) => `${idx + 1}. [${i.category}] ${i.title}\n   摘要:${i.summary}\n   热度:${i.score}`).join('\n') +
-  `\n\n【AI 概念股涨跌幅 %】\n` +
+  '只输出合法 JSON，不要 markdown 代码块。中文、有独立判断、敢给观点、不堆砌。';
+const user2 =
+  `今天是 ${sum.date}。当日 AI 资讯按模块如下：\n` +
+  moduleCtx.map((m) =>
+    `【${m.label}】\n` + (m.titles.length ? m.titles.map((t, i) => `  ${i + 1}. ${t}`).join('\n') : '  （今日暂无内容）')
+  ).join('\n') +
+  `\n\nAI 概念股当日涨跌（%）：\n` +
   stocks.map((s) => `${s.name}(${s.mkt}) ${s.changePct > 0 ? '+' : ''}${s.changePct}%`).join('  ') +
   `\n\n请输出 JSON：\n{
-  "headline": {"title":"当日最重磅一条的标题","comment":"一句话点评(<=40字)"},
+  "leadText": "今日导读一段话，60-100字，点出当日 AI 主线与最大变量",
+  "bubbleComment": "回答读者问题『AI 泡沫是不是在慢慢爆掉？』，80-140字，结合当日资讯与概念股表现给出你的判断，可以下明确结论",
+  "moduleReviews": {
+    "model-product": "模型&产品模块辣评，50-100字",
+    "industry-paper": "行业&论文模块辣评，50-100字",
+    "tips": "技巧与观点模块辣评，50-100字",
+    "stocks": "AI概念股模块辣评，50-100字，结合当日涨跌"
+  },
+  "headline": {"title":"当日最重磅一条标题","comment":"一句话点评(<=40字)"},
   "picks": [{"title":"重要条目标题","comment":"一句话点评(<=40字)"}],
   "stockComment": "一句话总结今日 AI 概念股整体盘面(<=60字)"
 }`;
 
 (async () => {
   try {
-    const r = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + API_KEY },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: 'system', content: sysPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.6,
-        max_tokens: 900,
-        response_format: { type: 'json_object' },
-      }),
-    });
-    const j = await r.json();
-    if (j.error) {
-      console.error('[enrich] API error:', JSON.stringify(j.error));
-      process.exit(1);
-    }
-    let txt = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
-    // 容错：去掉可能的 ```json 代码块包裹
-    const m = txt.match(/\{[\s\S]*\}/);
-    if (m) txt = m[0];
-    const data = JSON.parse(txt);
-    fs.writeFileSync(
-      path.join(ROOT, 'ai_daily_enriched.json'),
-      JSON.stringify({ date: sum.date, model: MODEL, ...data }, null, 2),
-      'utf8'
-    );
-    console.log('[enrich] 生成点评成功：headline +', (data.picks || []).length, '条精选');
+    const data1 = await callLLM(sys1, user1, 4096);
+    const data2 = await callLLM(sys2, user2, 1200);
+    const out = {
+      date: sum.date,
+      model: MODEL,
+      expanded: Array.isArray(data1.expanded) ? data1.expanded : [],
+      leadText: data2.leadText || '',
+      bubbleComment: data2.bubbleComment || '',
+      moduleReviews: data2.moduleReviews || {},
+      headline: data2.headline || null,
+      picks: Array.isArray(data2.picks) ? data2.picks : [],
+      stockComment: data2.stockComment || '',
+    };
+    fs.writeFileSync(path.join(ROOT, 'ai_daily_enriched.json'), JSON.stringify(out, null, 2), 'utf8');
+    console.log('[enrich] 生成成功：扩写 ' + out.expanded.length + ' 条摘要 + 4 模块辣评 + 泡沫导语 + 头条/精选');
   } catch (e) {
     console.error('[enrich] 失败:', e.message);
     process.exit(1);
