@@ -104,7 +104,11 @@ const STOCK_DEFS = [
   { t:'NVDA', name:'英伟达', mkt:'us' },
   { t:'MSFT', name:'微软', mkt:'us' },
   { t:'GOOGL', name:'谷歌', mkt:'us' },
+  { t:'META', name:'Meta', mkt:'us' },
   { t:'AMD', name:'AMD', mkt:'us' },
+  { t:'AVGO', name:'博通', mkt:'us' },
+  { t:'PLTR', name:'Palantir', mkt:'us' },
+  { t:'TSM', name:'台积电', mkt:'us' },
   { t:'TSLA', name:'特斯拉', mkt:'us' },
   { t:'005930', name:'三星电子', mkt:'kr' },
   { t:'000660', name:'SK海力士', mkt:'kr' },
@@ -309,7 +313,7 @@ function makeHead(daily, mobile) {
 <head>
 <meta charset="UTF-8">
 ${vp}
-<title>AI HOT 日报 · ${daily.date}</title>
+<title>AI HOT 日报 FOR ADRIAN · ${daily.date}</title>
 <style>
 ${css}
 </style>
@@ -318,7 +322,7 @@ ${css}
   <header class="hero">
     <div class="wrap">
       <div class="kicker">AI HOT Daily · 中文 AI 资讯晨报</div>
-      <h1>AI HOT 日报</h1>
+      <h1>AI HOT 日报 FOR ADRIAN</h1>
       <div class="date" id="heroDate"></div>
       <div class="meta" id="heroMeta"></div>
       <div id="fallbackBox"></div>
