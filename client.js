@@ -23,7 +23,7 @@ function fmtBJ(iso){
 // HERO
 document.getElementById('heroDate').textContent = fmtDateHuman(DATA.date);
 document.getElementById('heroMeta').textContent =
-  '每日北京时间 08:00 自动生成 · 数据来源 ' + DATA.source;
+  '每日北京时间 06:00 自动生成 · 数据来源 ' + DATA.source;
 if(DATA.lead){
   document.getElementById('leadText').textContent = DATA.lead;
 } else {
