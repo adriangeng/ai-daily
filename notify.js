@@ -43,8 +43,9 @@ const stocksTxt = sorted
 const upN = sum.stocks.filter((q) => q.changePct > 0).length;
 const downN = sum.stocks.filter((q) => q.changePct < 0).length;
 
-const secEmoji = { '模型发布/更新': '🤖', '产品发布/更新': '📦', '行业动态': '🌐', '论文研究': '📄', '技巧与观点': '💡' };
-const secLine = sum.sectionStats.map((s) => `${secEmoji[s.label] || '•'} ${s.label} ${s.count}`).join(' ｜ ');
+const MOD_EMOJI = { '模型 & 产品': '🤖📦', '行业 & 论文': '🌐📄', '技巧与观点': '💡', 'AI 概念股': '📈' };
+const secSource = sum.moduleStats || sum.sectionStats || [];
+const secLine = secSource.map((s) => `${MOD_EMOJI[s.label] || '•'} ${s.label} ${s.count}`).join(' ｜ ');
 
 const link = shareLink || '（未提供链接）';
 const title = `🦞 AI HOT 日报 FOR ADRIAN · ${sum.date}`;
@@ -58,6 +59,7 @@ if (enr && Array.isArray(enr.picks) && enr.picks.length) {
   highlight += '✨ 精选速览\n' + enr.picks.map((p, i) => `${i + 1}. ${p.title}\n   💬 ${p.comment || ''}`).join('\n') + '\n\n';
 }
 if (enr && enr.stockComment) highlight += `📊 盘面：${enr.stockComment}\n\n`;
+if (enr && enr.bubbleComment) highlight += `🫧 AI 泡沫在慢慢爆掉吗？\n${enr.bubbleComment}\n\n`;
 
 (async () => {
   let url, body;
