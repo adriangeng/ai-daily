@@ -1,92 +1,93 @@
 {
   "date": "2026-07-28",
-  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "model": "Qwen/Qwen2.5-14B-Instruct",
   "expanded": [
     {
       "title": "Kimi K3 开源：2.8T MoE 模型与技术报告",
-      "summary": "Kimi K3 是一个 2.8T 参数的模型，Kimi K3"
+      "summary": "Kimi 公司发布了他们最新的 Kimi K3 模型，这是一个拥有 2.8 万亿参数的 MoE（混合专家）模型，具备原生视觉理解和 1M token 的上下文窗口能力。该模型采用了新架构，实现了每单位计算智能提升 2.5 倍。除了模型权重外，Kimi 还开源了高性能注意力内核、MoE 通信库以及大规模智能体运行环境基础设施，进一步推动了 AI 领域的技术进步。"
     },
     {
       "title": "Kimi K3 上线 Modal，支持无损加速推理",
-      "summary": ",这是一个强大的MoE模型，具备原生视觉理解能力和处理 1.8M token 的上下文窗口。新架构实现了每单位计算提升222.55倍智能提升。。,"
+      "summary": "Modal 成为了 Kimi K3 的 Day 0 发布合作伙伴，他们为 K3 的架构训练了自定义 DFlash 投机器，实现了更快的推理速度且无质量损失。这一合作不仅提升了 Kimi K3 的性能，也为用户提供了更加高效和准确的 AI 体验。"
     },
     {
       "title": "Kimi 发布视觉感知基准 PerceptionBench",
-      "summary": ","
+      "summary": "Kimi 发布了视觉感知基准 PerceptionBench，该基准从当前前沿模型在 42 个基准上的失败模式中归纳出视觉感知基准，将视觉感知拆解为 10 种原子能力，并构建了 3000 道验证题，每道题只考察单一感知能力，无需推理或外部知识。此举有助于更精准地评估 AI 模型的视觉感知能力。"
     },
     {
       "title": "SGLang 和 Miles 为月之暗面 2.8T 参数 Kimi K3 模型提供发布当日支持",
-      "summary": "高性能注意力内核和MoE通信库以及大规模智能体运行环境基础设施已开源。"
+      "summary": "SGLang 和 Miles 为月之暗面开源的 2.8T 参数模型 Kimi K3 提供了发布当日支持，SGLang 负责推理，Miles 负责 RL 训练。K3 采用了 69 层 KDA 线性注意力与 24 层 MLA 交错的混合架构，其单卡 batch-1 解码速度可达约 113 tok/s，结合 DSpark 推测解码可达约 423 tok/s，极大提升了 AI 模型的训练和推理效率。"
     },
     {
       "title": "Google AI Overviews 搜索结果出现率升至43%",
-      "summary": "很高兴Dmodal成为K3 K3的Day 1发布合作伙伴！他们为K3的架构训练了自定义DFlash推理机器，实现实现实现更快推理且无有质量损失。"
+      "summary": "Google AI Overviews 在搜索结果中的出现率一年内显著提升，从 15% 升至 43%，AI Mode 月访问量从 1.26 亿增至 2.79 亿。用户搜索长度增加，正从短关键词转向更长的自然对话式查询，反映了用户对 AI 技术的深入需求。"
     },
     {
       "title": "NVIDIA 等多家行业领袖联合成立 Open Secure AI Alliance，推动 AI 安全与防御开源化",
-      "summary": " "
+      "summary": "NVIDIA、Microsoft、Hugging Face、IBM 等数十家机构联合成立了 Open Secure AI Alliance，旨在通过开源模型、工具和框架构建可审查、可定制的 AI 安全防御体系。此举将推动 AI 安全与防御技术的开源化，促进更广泛的应用与合作。"
     },
     {
       "title": "Cognizant 与 Anthropic 扩大合作，成为 Claude Partner Network 全球首要合作伙伴",
-      "summary": ",Kimii P发布一个视觉感知基准Per Bench"
+      "summary": "Cognizant 与 Anthropic 扩大合作，成为 Claude Partner Network 中的 Global Premier Partner，并将 Claude 嵌入其 Flowsource 等平台。已有超过 3 万名员工完成 Claude 培训，其为一家生物制药公司构建的智能合约系统将合同审核时间缩短最高 40%，提取准确率超过 88%，显示了 AI 技术在商业应用中的巨大潜力。"
     },
     {
       "title": "Apple 提出 GH-ESD：面向实例级视觉任务的假设驱动错误切片发现方法",
-      "summary": ",该3个视觉感知能力被拆解为1 10 种原子能力，并并 "
+      "summary": "Apple 机器学习研究团队提出 GH-ESD（Grounded Hypothesis-Driven Error Slice Discovery），一种针对目标检测与分割等实例级视觉任务的错误切片发现方法。GH-ESD 通过基于假设的驱动方式，系统性地发现模型在语义连贯子集上的系统性失效，为 AI 视觉任务的优化提供了新的思路。"
     },
     {
-      "title": "",
-      "summary": "%基准构建了32个视觉感知能力 "
+      "title": "用AI Skill自动生成可协作HTML PPT",
+      "summary": "第1条扩写摘要(120-160字)Vista基于bento PPT开发的AI Skill，能依据用户输入的内容或主题自动生成可编辑、在线演示并支持多人协作的HTML PPT。此Skill的安装指令为`npx skills add joeseesun/qiaomu-bento-ppt`，推荐使用Kimi K3或Opus 4.8+等前端审美好的模型。它为用户提供了更加灵活和高效的演示文稿制作方式，特别适合团队协作的场景，能够大幅提升工作效率与演示效果，是现代办公中不可或缺的工具之一。"
     },
     {
-      "title": "",
-      "summary": ", 开源的8.8T 参数模型K3已实现6种  1"
+      "title": "GitHub Copilot 发布“Harness”工作流：用单一工具完成原型、规划、实现与代码审查",
+      "summary": "第2条扩写摘要GitHub Copilot推出“Harness”工作流，旨在简化软件开发流程，使开发者能够通过单一AI工具完成从原型设计、规划、实现到代码审查的全过程。此举不仅提高了开发效率，还减少了工具切换带来的学习成本和时间损耗，使开发者能够更专注于代码质量和项目创新。该工作流的集成性和实用性，为软件开发团队提供了一种更高效、更便捷的工作方式，有助于提升整体开发质量和项目进度。"
     },
     {
-      "title": "",
-      "summary": ", K3模型支持基于SGLang和ML MLA交错的混合架构， "
+      "title": "用Claude和Python构建技能驱动的金融分析智能体",
+      "summary": "第3条扩写摘要本教程利用Anthropic的financial-services仓库，通过解析SKILL.md文件构建可搜索技能注册表，并创建可复用SkillAgent，结合Anthropic Messages API实现金融分析剧本的迭代工具调用循环。此方法不仅提升了金融分析的效率，还增强了对复杂金融数据的处理能力，为金融分析师提供了强大的工具支持，有助于推动金融行业的智能化进程。"
     },
     {
-      "title": "",
-      "summary": ",参数模型K3为每单位8 tok/s实现"
+      "title": "OpenAI 称越来越多员工用 ChatGPT 做其他岗位的工作",
+      "summary": "第4条扩写摘要OpenAI分析发现，43.5%的ChatGPT岗位特定查询涉及另一职业，如营销和工程任务交叉最多。这表明AI工具正在改变传统岗位职责，用户开始用AI处理合同审查、数据分析等工作。OpenAI认为这是岗位职责变化的早期信号，尤其在缺乏专业团队的小公司中更为明显。这一趋势反映了AI技术在工作流程中的深度介入，正逐步改变职场生态。"
     },
     {
-      "title": "",
-      "summary": ", DSpark推理模型K3已实现准确率超过83 tok/s。 "
+      "title": "GitHub Copilot app 入门指南：多 Agent 会话工作区与 Canvas 预览",
+      "summary": "第5条扩写摘要GitHub Copilot app升级为多Agent会话工作区，支持同时管理多个任务线程，通过Canvas预览UI并直接点选修改。用户可为每个会话绑定项目上下文，通过Agent Merge自动处理PR审查反馈和合并冲突。此举不仅提升了开发效率，还增强了团队协作能力，使开发者能够更专注于代码质量和项目创新。"
     },
     {
-      "title": "",
-      "summary": "\n NVIDIA、 Microsoft等MicrosoftHugging FaceIBM"
+      "title": "浪费20亿Token后，我开源了帮Agent定义目标的Leader.skill",
+      "summary": "第6条扩写摘要作者开源了Leader.skill，用于将模糊的人类需求转化为Agent可独立执行数小时的目标任务书。该Skill基于“目标七问”方法论，涵盖目的、完成态、反作弊、边界等维度，推荐使用Claude Fable 5或Kimi K3规划目标，再交由GPT-5.6 Sol或GLM-5.2等模型执行。此举旨在提升AI任务执行的准确性和效率，为用户提供了强大的任务管理工具。"
     },
     {
-      "title": "",
-      "summary": "\n数十N机构联合成立Secure AI Alliance旨在通过开源模型、工具和框架构建审查定制N安安全防御体系。 "
+      "title": "Anthropic 澄清立场：从未主张全面禁止开源权重模型，支持芯片出口管制与安全测试",
+      "summary": "第7条扩写摘要Anthropic CEO Dario Amodei明确表示，公司从未主张全面禁止开源权重模型，认为不具备危险能力的开源权重模型是公共产品。他提出三项实际措施：对华芯片出口管制、打击工业级知识蒸馏、对所有足够强大的模型进行强制性安全测试。Amodei指出，保护主义禁令无法解决其最担忧的国家安全威胁，包括威权政府利用更强大AI实现军事优势或深度监控。此举旨在平衡AI技术的发展与安全，确保AI技术的安全可控。"
     },
     {
-      "title": "",
-      "summary": "\nClaudeD Partner Network是全球全球全球全球全球全球N全球"
-    },
-    {
-      "title": "",
-      "summary": "\nClaudeD Partner Network是基于Global PremierPremN"
-    },
-    {
-      "title": "",
-      "summary": "\n超过超过4万名员工完成Claudee培训其其为一家生生物制药公司构建智能合约系统N"
-    },
-    {
-      "title": "",
-      "summary": "\nApple 机器学习研究团队提出GH-ESD一种针对目标检测检测与分割实例级视觉任务的错误错误切片发现方法。 "
-    },
-    {
-      "title": "",
-      "summary": "\nApple 机器学习研究团队提出GH-ESD一种针对目标检测与分割实例级视觉任务的错误错误切片发现方法。基于假设驱动方式发现模型在语义连贯上的N性失效。"
+      "title": "OpenRouter 新增图像生成模型专用 API 端点",
+      "summary": "第8条扩写摘要OpenRouter新增图像生成模型专用API端点，通过`/api/v1/images`提供图像生成服务，图像理解仍通过`/chat/completions`端点完成，两者共用同一API Key和计费体系。此举不仅为开发者提供了更加灵活的图像处理工具，还提升了图像生成和理解的效率，有助于推动AI技术在图像处理领域的应用。"
     }
   ],
-  "leadText": "今日今日AI市场整体表现较为低迷，，智谱(港股)跌26.6%%,成为表现最差的个股。点",
-  "bubbleComment": "『AI泡沫是否在逐渐消退，点结合今日美股和韩股AI概念股的表现来看，主要科技巨头股价调整明显 但长期来看AI行业仍具潜力",
-  "moduleReviews": {},
-  "headline": null,
-  "picks": [],
-  "stockComment": ""
+  "leadText": "今日 AI 概念股涨跌不一，英伟达、AMD 下跌，跌幅较大，而微软、谷歌则逆市上涨，三星电子与 SK 海力士跌幅超过 10%，港股智谱领跌，跌幅近 20%。市场波动反映出投资者对 AI 企业业绩预期的分化。",
+  "bubbleComment": "今日 AI 概念股的大幅波动，尤其是英伟达与 AMD 的下跌，似乎在印证 AI 泡沫正在逐渐破裂的观点。但微软和谷歌的逆势上扬，也显示了市场对部分 AI 龙头企业的信心依旧。整体来看，AI 泡沫的破裂是一个渐进过程，投资者需保持谨慎，关注企业实际业绩。",
+  "moduleReviews": {
+    "model-product": "Kimi K3 开源动作频频，不仅发布技术报告和视觉感知基准，还上线 Modal 无损加速推理，显示其在大模型开源领域的领导地位。",
+    "industry-paper": "Google AI Overviews 搜索结果率上升，NVIDIA 推动 AI 安全开源，Cognizant 与 Anthropic 合作深化，显示行业巨头在 AI 领域的影响力。",
+    "tips": "GitHub Copilot 的新工作流和 OpenAI 的内部应用趋势，揭示了 AI 技术在开发流程中的深度整合，以及员工对 AI 工具的依赖。",
+    "stocks": "尽管 AI 资讯丰富，但今日 AI 相关概念股表现平平，需关注具体公司产品落地与行业动向，以评估其长期投资价值。"
+  },
+  "headline": {
+    "title": "Kimi K3 开源：2.8T MoE 模型与技术报告",
+    "comment": "开源大模型推动 AI 技术共享与进步"
+  },
+  "picks": [
+    {
+      "title": "Google AI Overviews 搜索结果出现率升至43%",
+      "comment": "Google AI 搜索可见性提升，AI 应用普及加速"
+    },
+    {
+      "title": "NVIDIA 等多家行业领袖联合成立 Open Secure AI Alliance",
+      "comment": "AI 安全联盟成立，行业向更健康方向发展"
+    }
+  ],
+  "stockComment": "今日 AI 概念股涨跌不一，英伟达、AMD 下跌，微软、谷歌小幅上涨，整体盘面波动较大。"
 }
