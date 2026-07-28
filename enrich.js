@@ -4,6 +4,9 @@
 // 生成内容：①每条新闻 120-160 字扩写摘要 ②4 模块各 50-100 字辣评
 //          ③AI 泡沫导语段 80-140 字 ④动态今日导读 ⑤头条/精选/盘面点评（供微信）
 // 无 LLM_API_KEY 时优雅跳过（continue-on-error 兜底，网页走规则降级版）
+//
+// 稳健性设计：所有生成拆成多个「小 JSON」调用，单次 JSON 越小越不易被 7B 模型写崩；
+// 扩写按 8 条/批分多批避免 token 截断；文本统一用中文引号，禁用英文双引号（消除转义断裂）。
 const fs = require('fs');
 const path = require('path');
 const ROOT = __dirname;
@@ -50,6 +53,8 @@ const stocks = (sum.stocks || []).map((s) => ({
   name: s.name, mkt: s.mkt, changePct: +(s.changePct || 0).toFixed(2),
 }));
 
+const NO_QUOTE_RULE = '文本中如需引用，必须使用中文引号「」或『』，禁止使用英文双引号，以避免破坏 JSON。';
+
 function stripJSON(txt) {
   const m = txt.match(/\{[\s\S]*\}/);
   return m ? m[0] : txt;
@@ -91,49 +96,82 @@ async function callLLMRetry(system, user, maxTokens, tag) {
   return null;
 }
 
-// ---- Call 1：扩写每条新闻摘要至 120-160 字（按序字符串数组，避免标题字段 JSON 断裂） ----
-const sys1 =
-  '你是中文 AI 资讯编辑。只输出合法 JSON，不要任何解释，不要用 markdown 代码块包裹。' +
-  '为每条新闻把过短的摘要扩写成信息量充足的段落。';
-const user1 =
-  `今天是 ${sum.date}。下面有 ${expandItems.length} 条新闻（标题+原摘要）。请为每条把「原摘要」扩写到 120–160 字（中文），` +
-  `补全背景、影响与看点，保持客观，不要编造原文未提及的具体数字或结论。严格按输入顺序输出，不要遗漏、不要合并。` +
-  `所有字符串内的双引号必须转义为 \\"，不要使用未转义的换行。\n\n` +
-  expandItems.map((it, i) => `${i + 1}. 标题:${it.title}\n   原摘要:${it.summary}`).join('\n') +
-  `\n\n请只输出 JSON：\n{ "summaries": ["第1条扩写摘要(120-160字)","第2条扩写摘要", ...] }\n（summaries 长度必须等于 ${expandItems.length}）`;
+// ---- Call 1：扩写摘要，按 8 条/批分多批（小 JSON + 防截断） ----
+const sysExpand =
+  '你是中文 AI 资讯编辑。只输出合法 JSON，不要任何解释，不要用 markdown 代码块包裹。' + NO_QUOTE_RULE;
+async function expandChunk(chunk, idx, total) {
+  const user =
+    `今天是 ${sum.date}。下面有 ${chunk.length} 条新闻（标题+原摘要），是第 ${idx + 1}/${total} 批。` +
+    `请为每条把「原摘要」扩写到 120–160 字（中文），补全背景、影响与看点，保持客观，不要编造原文未提及的具体数字或结论。` +
+    `严格按输入顺序输出字符串数组，不要遗漏、不要合并。\n\n` +
+    chunk.map((it, i) => `${i + 1}. 标题:${it.title}\n   原摘要:${it.summary}`).join('\n') +
+    `\n\n请只输出 JSON：\n{ "summaries": ["第1条扩写摘要(120-160字)","第2条扩写摘要", ...] }`;
+  const d = await callLLMRetry(sysExpand, user, 4096, '扩写摘要批' + (idx + 1));
+  const arr = d && Array.isArray(d.summaries) ? d.summaries : [];
+  return arr.map((s, i) => ({ title: chunk[i] ? chunk[i].title : '', summary: s || '' }));
+}
 
-// ---- Call 2：模块辣评 + 泡沫导语 + 动态导读 + 微信头条/精选 ----
-const moduleCtx = MODULES.map((m) => {
-  const titles = [];
-  for (const lab of m.secs) {
-    const sec = byLabel[lab];
-    for (const it of ((sec && sec.items) || [])) titles.push(it.title);
-  }
-  return { key: m.key, label: m.label, titles };
-});
-const sys2 =
-  '你是资深 AI 行业编辑，为关注 AI 与资本市场的中国读者写每日速评。' +
-  '只输出合法 JSON，不要 markdown 代码块。中文、有独立判断、敢给观点、不堆砌。';
-const user2 =
-  `今天是 ${sum.date}。当日 AI 资讯按模块如下：\n` +
-  moduleCtx.map((m) =>
+// ---- Call 2a：4 模块辣评（小 JSON） ----
+const sysReview =
+  '你是资深 AI 行业编辑，为关注 AI 与资本市场的中国读者写速评。只输出合法 JSON，不要 markdown 代码块。' +
+  '中文、有独立判断、敢给观点、不堆砌。' + NO_QUOTE_RULE;
+function moduleCtxText() {
+  const moduleCtx = MODULES.map((m) => {
+    const titles = [];
+    for (const lab of m.secs) {
+      const sec = byLabel[lab];
+      for (const it of ((sec && sec.items) || [])) titles.push(it.title);
+    }
+    return { label: m.label, titles };
+  });
+  return moduleCtx.map((m) =>
     `【${m.label}】\n` + (m.titles.length ? m.titles.map((t, i) => `  ${i + 1}. ${t}`).join('\n') : '  （今日暂无内容）')
-  ).join('\n') +
-  `\n\nAI 概念股当日涨跌（%）：\n` +
-  stocks.map((s) => `${s.name}(${s.mkt}) ${s.changePct > 0 ? '+' : ''}${s.changePct}%`).join('  ') +
-  `\n\n请只输出 JSON：\n{
+  ).join('\n');
+}
+async function genModuleReviews() {
+  const user =
+    `今天是 ${sum.date}。当日 AI 资讯按模块：\n` + moduleCtxText() +
+    `\n\n请只输出 JSON：\n{ "moduleReviews": {
+  "model-product": "模型&产品模块辣评，50-100字",
+  "industry-paper": "行业&论文模块辣评，50-100字",
+  "tips": "技巧与观点模块辣评，50-100字",
+  "stocks": "AI概念股模块辣评，50-100字，结合当日涨跌"
+} }`;
+  const d = await callLLMRetry(sysReview, user, 800, '模块辣评');
+  return (d && d.moduleReviews) ? d.moduleReviews : {};
+}
+
+// ---- Call 2b：动态导读 + 泡沫导语（小 JSON） ----
+async function genLeadBubble() {
+  const user =
+    `今天是 ${sum.date}。AI 概念股当日涨跌（%）：\n` +
+    stocks.map((s) => `${s.name}(${s.mkt}) ${s.changePct > 0 ? '+' : ''}${s.changePct}%`).join('  ') +
+    `\n\n请只输出 JSON：\n{
   "leadText": "今日导读一段话，60-100字，点出当日 AI 主线与最大变量",
-  "bubbleComment": "回答读者问题『AI 泡沫是不是在慢慢爆掉？』，80-140字，结合当日资讯与概念股表现给出你的判断，可以下明确结论",
-  "moduleReviews": {
-    "model-product": "模型&产品模块辣评，50-100字",
-    "industry-paper": "行业&论文模块辣评，50-100字",
-    "tips": "技巧与观点模块辣评，50-100字",
-    "stocks": "AI概念股模块辣评，50-100字，结合当日涨跌"
-  },
+  "bubbleComment": "回答读者问题『AI 泡沫是不是在慢慢爆掉？』，80-140字，结合当日资讯与概念股表现给出你的判断，可以下明确结论"
+}`;
+  const d = await callLLMRetry(sysReview, user, 800, '导读/泡沫导语');
+  return d ? { leadText: d.leadText || '', bubbleComment: d.bubbleComment || '' } : { leadText: '', bubbleComment: '' };
+}
+
+// ---- Call 2c：微信头条/精选/盘面（小 JSON，原可用结构） ----
+async function genHeadline() {
+  const items = (daily.sections || []).flatMap((sec) => (sec.items || []).map((it) => it.title)).slice(0, 16);
+  const user =
+    `今天是 ${sum.date}。当日 AI 资讯标题：\n` + items.map((t, i) => `${i + 1}. ${t}`).join('\n') +
+    `\n\nAI 概念股涨跌（%）：` + stocks.map((s) => `${s.name} ${s.changePct > 0 ? '+' : ''}${s.changePct}%`).join('  ') +
+    `\n\n请只输出 JSON：\n{
   "headline": {"title":"当日最重磅一条标题","comment":"一句话点评(<=40字)"},
   "picks": [{"title":"重要条目标题","comment":"一句话点评(<=40字)"}],
   "stockComment": "一句话总结今日 AI 概念股整体盘面(<=60字)"
 }`;
+  const d = await callLLMRetry(sysReview, user, 600, '头条/精选');
+  return d ? {
+    headline: d.headline || null,
+    picks: Array.isArray(d.picks) ? d.picks : [],
+    stockComment: d.stockComment || '',
+  } : { headline: null, picks: [], stockComment: '' };
+}
 
 (async () => {
   const out = {
@@ -148,25 +186,28 @@ const user2 =
     stockComment: '',
   };
 
-  const d1 = await callLLMRetry(sys1, user1, 4096, '扩写摘要');
-  if (d1 && Array.isArray(d1.summaries)) {
-    d1.summaries.forEach((s, i) => {
-      if (expandItems[i]) out.expanded.push({ title: expandItems[i].title, summary: s || '' });
-    });
+  // 扩写：8 条/批
+  const CHUNK = 8;
+  for (let i = 0; i < expandItems.length; i += CHUNK) {
+    const chunk = expandItems.slice(i, i + CHUNK);
+    const part = await expandChunk(chunk, i / CHUNK, Math.ceil(expandItems.length / CHUNK));
+    out.expanded.push(...part);
   }
 
-  const d2 = await callLLMRetry(sys2, user2, 1200, '模块辣评/导语');
-  if (d2) {
-    out.leadText = d2.leadText || '';
-    out.bubbleComment = d2.bubbleComment || '';
-    out.moduleReviews = d2.moduleReviews || {};
-    out.headline = d2.headline || null;
-    out.picks = Array.isArray(d2.picks) ? d2.picks : [];
-    out.stockComment = d2.stockComment || '';
-  }
+  const [reviews, leadBubble, headline] = await Promise.all([
+    genModuleReviews(),
+    genLeadBubble(),
+    genHeadline(),
+  ]);
+  out.moduleReviews = reviews;
+  out.leadText = leadBubble.leadText;
+  out.bubbleComment = leadBubble.bubbleComment;
+  out.headline = headline.headline;
+  out.picks = headline.picks;
+  out.stockComment = headline.stockComment;
 
   fs.writeFileSync(path.join(ROOT, 'ai_daily_enriched.json'), JSON.stringify(out, null, 2), 'utf8');
   console.log('[enrich] 生成完成：扩写 ' + out.expanded.length + '/' + expandItems.length +
-    ' 条摘要 + 模块辣评' + (out.bubbleComment ? ' + 泡沫导语' : '') +
-    (out.headline ? ' + 头条/精选' : ''));
+    ' 条摘要' + (out.moduleReviews && Object.keys(out.moduleReviews).length ? ' + 模块辣评' : '') +
+    (out.bubbleComment ? ' + 泡沫导语' : '') + (out.headline ? ' + 头条/精选' : ''));
 })();
