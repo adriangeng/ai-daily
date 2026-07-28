@@ -29,6 +29,13 @@ if(DATA.lead){
 } else {
   document.getElementById('leadBox').style.display = 'none';
 }
+if(DATA.bubbleComment){
+  const bb = document.getElementById('leadBox');
+  const d = document.createElement('div');
+  d.className = 'bubble';
+  d.innerHTML = '<span class="bl">🫧 AI 泡沫在慢慢爆掉吗？</span>' + DATA.bubbleComment;
+  bb.appendChild(d);
+}
 document.getElementById('totalNum').textContent = DATA.total;
 
 if(!DATA.isToday){
@@ -39,7 +46,7 @@ if(!DATA.isToday){
 
 // STATS
 const statsEl = document.getElementById('stats');
-DATA.sectionStats.forEach(function(s,i){
+DATA.moduleStats.forEach(function(s,i){
   const c = ['var(--s1)','var(--s2)','var(--s3)','var(--s4)','var(--s5)'][i];
   const el = document.createElement('div');
   el.className = 'stat';
@@ -49,7 +56,7 @@ DATA.sectionStats.forEach(function(s,i){
 
 // NAV
 const navEl = document.getElementById('nav');
-DATA.sections.forEach(function(s,i){
+DATA.modules.forEach(function(s,i){
   const a = document.createElement('a');
   a.href = '#sec-' + i;
   a.innerHTML = s.label + '<span class="c">' + s.items.length + '</span>';
@@ -64,7 +71,7 @@ if(DATA.stocks && DATA.stocks.length){
 
 // SECTIONS + CARDS
 const main = document.getElementById('main');
-DATA.sections.forEach(function(s,i){
+DATA.modules.forEach(function(s,i){
   const sec = document.createElement('section');
   sec.className = 'section';
   sec.id = 'sec-' + i;
@@ -79,7 +86,15 @@ DATA.sections.forEach(function(s,i){
   if(s.empty){
     grid.innerHTML = '<div style="grid-column:1/-1;color:var(--sub);font-size:13.5px;' +
       'background:#fff;border:1px dashed var(--line);border-radius:14px;padding:18px 20px">' +
-      '今日该版块暂无入选内容</div>';
+      '今日该模块暂无入选内容</div>';
+  }
+  if(s.review){
+    const note = document.createElement('div');
+    note.className = 'comment edit';
+    note.style.gridColumn = '1/-1';
+    note.style.marginTop = '0';
+    note.innerHTML = '<span class="cl">模块辣评</span>' + s.review;
+    grid.appendChild(note);
   }
   if(s.comment){
     const note = document.createElement('div');
