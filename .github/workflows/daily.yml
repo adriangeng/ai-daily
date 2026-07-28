@@ -74,6 +74,13 @@ jobs:
             echo "PUSH_CONFIG_JSON secret 未配置，跳过微信推送"
             exit 0
           fi
+      - name: AI enrich (LLM 一句话点评)
+        continue-on-error: true
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+        run: node enrich.js
+
           printf '%s' "$PUSH_CONFIG_JSON" > .push_config.json
           # 微信推送用 GitHub Pages 固定链接（Content-Type 正确，可正常渲染网页）
-          node push_notify.js "https://adriangeng.github.io/ai-daily/"
+          node notify.js "https://adriangeng.github.io/ai-daily/"
