@@ -1,0 +1,44 @@
+{
+  "date": "2026-07-28",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "expanded": [
+    {
+      "title": "Kimi K3 开源：2.8T MoE 模型与技术报告",
+      "summary": "北京时间:Kimii K3模型开源，该模型拥有2.8T参数，支持原生视觉理解和1M token上下文窗口，新架构实现每单位计算提升2.5倍智能能力。除了还Kimi 迫源还还 K3模型还开源了高性能注意力内核、MoE 通信库以及大规模智能体运行环境基础设施。"
+    },
+    {
+      "title": "Kimi K3 上线 Modal，支持无损加速推理",
+      "summary": "北京时间:K modal成为K3模型Day 1支持，该modal训练了自定义DFlash投射机器，实现快速无损推理。"
+    },
+    {
+      "title": "Kimi 发布视觉感知基准 PerceptionBench",
+      "summary": "北京时间:Kimi 发布视觉感知基准PerceptionBench，该基准将视觉感知拆解为1 1种种能，并 1M种原子能力，构建了3个视觉感知任务。"
+    },
+    {
+      "title": "SGLang 和 Miles 为月之暗面 2.8T 参数 Kimi K3 模型提供发布当日支持",
+      "summary": "北京时间:Kimi 发布SGLang模型，该模型基于SGLang语言，结合MLaMD和ML推理验证，实现自动生成DHTML PPT。"
+    },
+    {
+      "title": "Google AI Overviews 搜索结果出现率升至43%",
+      "summary": "北京时间:K NVIDIA、Microsoft、Hugging Face、IBM等等成立N Secure AI Alliance，旨在通过开源模型、工具和框架构建审查、定制的AI安全防御体系。"
+    },
+    {
+      "title": "NVIDIA 等多家行业领袖联合成立 Open Secure AI Alliance，推动 AI 安全与防御开源化",
+      "summary": "北京时间:Cognizant与Anthropic扩大合作，成为Claude Partner Network，全球首要合作伙伴，该合作将扩大Anthropic的生物制药智能合约系统。"
+    },
+    {
+      "title": "Cognizant 与 Anthropic 扩大合作，成为 Claude Partner Network 全球首要合作伙伴",
+      "summary": "北京时间:K苹果提出GH-ESD假设驱动错误片段发现方法，该方法针对目标检测与分割的实例级错误切片发现。当前方法难以捕捉由于上下文关系和空间视觉模式导致的实例级失败。GH-ESD通过基于假设的驱动方式系统地发现模型在语义连贯上的文的系统失效。"
+    },
+    {
+      "title": "Apple 提出 GH-ESD：面向实例级视觉任务的假设驱动错误切片发现方法",
+      "summary": "北京时间:KOpenAI提出GH-ESD方法，为AI技能驱动金融分析智能体构建了新的生成D协作HTML PPT。该模型旨在减少实例级视觉任务中由于图像级分类难以捕捉的由于上下文关系和空间视觉模式导致的实例级失败。"
+    }
+  ],
+  "leadText": "",
+  "bubbleComment": "",
+  "moduleReviews": {},
+  "headline": null,
+  "picks": [],
+  "stockComment": ""
+}
