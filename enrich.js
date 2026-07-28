@@ -1,7 +1,7 @@
 // enrich.js —— 调用云端 LLM 生成增强内容（新建文件，不修改原四件套）
 // 读取 daily_raw.json（当日资讯，与 build.js 渲染顺序一致）+ ai_daily_summary.json（股票）
 // 输出 ai_daily_enriched.json，供 build.js（网页）与 notify.js（微信）消费
-// 生成内容：①每条新闻 120-160 字扩写摘要 ②4 模块各 50-100 字辣评
+// 生成内容：①每条新闻 130-170 字扩写摘要 ②4 模块各 90-140 字辣评（信息密度优先，可略多）
 //          ③AI 泡沫导语段 80-140 字 ④动态今日导读 ⑤头条/精选/盘面点评（供微信）
 // 无 LLM_API_KEY 时优雅跳过（continue-on-error 兜底，网页走规则降级版）
 //
@@ -102,7 +102,7 @@ const sysExpand =
 async function expandChunk(chunk, idx, total) {
   const user =
     `今天是 ${sum.date}。下面有 ${chunk.length} 条新闻（标题+原摘要），是第 ${idx + 1}/${total} 批。` +
-    `请为每条把「原摘要」扩写到 120–160 字（中文），补全背景、影响与看点，保持客观，不要编造原文未提及的具体数字或结论。` +
+    `请为每条把「原摘要」扩写到 130–170 字（中文），补全背景、影响与看点，保持客观，不要编造原文未提及的具体数字或结论。` +
     `严格按输入顺序输出字符串数组，不要遗漏、不要合并。\n\n` +
     chunk.map((it, i) => `${i + 1}. 标题:${it.title}\n   原摘要:${it.summary}`).join('\n') +
     `\n\n请只输出 JSON：\n{ "summaries": ["第1条扩写摘要(120-160字)","第2条扩写摘要", ...] }`;
@@ -132,10 +132,10 @@ async function genModuleReviews() {
   const user =
     `今天是 ${sum.date}。当日 AI 资讯按模块：\n` + moduleCtxText() +
     `\n\n请只输出 JSON：\n{ "moduleReviews": {
-  "model-product": "模型&产品模块辣评，50-100字",
-  "industry-paper": "行业&论文模块辣评，50-100字",
-  "tips": "技巧与观点模块辣评，50-100字",
-  "stocks": "AI概念股模块辣评，50-100字，结合当日涨跌"
+  "model-product": "模型&产品模块辣评，90–140 字，信息密度优先，可略多",
+  "industry-paper": "行业&论文模块辣评，90–140 字，信息密度优先，可略多",
+  "tips": "技巧与观点模块辣评，90–140 字，信息密度优先，可略多",
+  "stocks": "AI概念股模块辣评，90–140 字，信息密度优先，可略多，结合当日涨跌"
 } }`;
   const d = await callLLMRetry(sysReview, user, 800, '模块辣评');
   return (d && d.moduleReviews) ? d.moduleReviews : {};
