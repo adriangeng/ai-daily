@@ -75,5 +75,5 @@ jobs:
             exit 0
           fi
           printf '%s' "$PUSH_CONFIG_JSON" > .push_config.json
-          # 微信推送用 jsDelivr 镜像链接（大陆可直连），github.io 作为海外备用
-          node push_notify.js "https://cdn.jsdelivr.net/gh/adriangeng/ai-daily@main/index.html"
+          # 微信推送用 GitHub Pages 固定链接（Content-Type 正确，可正常渲染网页）
+          node push_notify.js "https://adriangeng.github.io/ai-daily/"
