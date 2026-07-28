@@ -74,6 +74,29 @@ function truncate(str, max = 60) {
   return arr.slice(0, max).join('') + '…';
 }
 
+// ---- 公众号载体识别 + 同标题去重优先公众号 ----
+function isWeChatSource(src) {
+  return typeof src === 'string' && src.trim().startsWith('公众号：');
+}
+function normTitle(s) {
+  return (s || '').toLowerCase().replace(/[\s\p{P}\p{S}]+/gu, '');
+}
+// 同标题近似去重：保留一个；若同类标题有公众号源，则优先保留公众号源（标题相同才能保证扩写摘要匹配）
+function dedupePreferWeChat(items) {
+  const map = new Map();
+  for (const it of items) {
+    const k = normTitle(it.title);
+    if (!k) { map.set('__uniq_' + map.size, it); continue; }
+    const ex = map.get(k);
+    if (!ex) { map.set(k, it); }
+    else if (isWeChatSource(it.sourceName) && !isWeChatSource(ex.sourceName)) { map.set(k, it); }
+  }
+  const out = [...map.values()];
+  // 公众号前置，方便一眼定位、点开看评论
+  out.sort((a, b) => (isWeChatSource(a.sourceName) ? 0 : 1) - (isWeChatSource(b.sourceName) ? 0 : 1));
+  return out;
+}
+
 // ---- editorial lead (~120 chars) + per-item sharp commentary (truth-style) ----
 const LEAD = '今日 AI 两极化：Grok CLI、Suno 上新；ChatGPT 被套出“高中生级”制毒指南、Claude Opus 5 提示词遭泄露。开源战升温，OpenAI 求封中国模型、黄仁勋马斯克护开源；8 美元芯片跑模型，AI 从云掉进掌心。';
 
@@ -222,14 +245,11 @@ async function fetchQuote(def) {
   for (const sec of (daily.sections || [])) byLabel[sec.label] = sec;
 
   for (const m of MODULES) {
-    const items = [];
+    let raw = [];
     for (const lab of m.secs) {
       const sec = byLabel[lab];
-      const rawItems = (sec && sec.items) || [];
-      for (const it of rawItems) {
-        globalN += 1;
-        items.push({
-          n: globalN,
+      for (const it of (sec && sec.items) || []) {
+        raw.push({
           title: it.title || '(无标题)',
           summary: expSummary(it.title, truncate(it.summary, 60)),
           sourceName: it.sourceName || it.source || '未知来源',
@@ -238,6 +258,13 @@ async function fetchQuote(def) {
           comment: COMMENTS[norm(it.title)] || '',
         });
       }
+    }
+    // 同标题近似去重：优先保留公众号源；再把公众号前置
+    const items = dedupePreferWeChat(raw);
+    for (const it of items) {
+      globalN += 1;
+      it.n = globalN;
+      it.isWeChat = isWeChatSource(it.sourceName);
     }
     modules.push({
       key: m.key, label: m.label,
