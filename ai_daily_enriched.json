@@ -4,39 +4,87 @@
   "expanded": [
     {
       "title": "Kimi K3 开源：2.8T MoE 模型与技术报告",
-      "summary": "北京时间:Kimii K3模型开源，该模型拥有2.8T参数，支持原生视觉理解和1M token上下文窗口，新架构实现每单位计算提升2.5倍智能能力。除了还Kimi 迫源还还 K3模型还开源了高性能注意力内核、MoE 通信库以及大规模智能体运行环境基础设施。"
+      "summary": "Kimi K3 是一个 2.8T 参数的模型，Kimi K3"
     },
     {
       "title": "Kimi K3 上线 Modal，支持无损加速推理",
-      "summary": "北京时间:K modal成为K3模型Day 1支持，该modal训练了自定义DFlash投射机器，实现快速无损推理。"
+      "summary": ",这是一个强大的MoE模型，具备原生视觉理解能力和处理 1.8M token 的上下文窗口。新架构实现了每单位计算提升222.55倍智能提升。。,"
     },
     {
       "title": "Kimi 发布视觉感知基准 PerceptionBench",
-      "summary": "北京时间:Kimi 发布视觉感知基准PerceptionBench，该基准将视觉感知拆解为1 1种种能，并 1M种原子能力，构建了3个视觉感知任务。"
+      "summary": ","
     },
     {
       "title": "SGLang 和 Miles 为月之暗面 2.8T 参数 Kimi K3 模型提供发布当日支持",
-      "summary": "北京时间:Kimi 发布SGLang模型，该模型基于SGLang语言，结合MLaMD和ML推理验证，实现自动生成DHTML PPT。"
+      "summary": "高性能注意力内核和MoE通信库以及大规模智能体运行环境基础设施已开源。"
     },
     {
       "title": "Google AI Overviews 搜索结果出现率升至43%",
-      "summary": "北京时间:K NVIDIA、Microsoft、Hugging Face、IBM等等成立N Secure AI Alliance，旨在通过开源模型、工具和框架构建审查、定制的AI安全防御体系。"
+      "summary": "很高兴Dmodal成为K3 K3的Day 1发布合作伙伴！他们为K3的架构训练了自定义DFlash推理机器，实现实现实现更快推理且无有质量损失。"
     },
     {
       "title": "NVIDIA 等多家行业领袖联合成立 Open Secure AI Alliance，推动 AI 安全与防御开源化",
-      "summary": "北京时间:Cognizant与Anthropic扩大合作，成为Claude Partner Network，全球首要合作伙伴，该合作将扩大Anthropic的生物制药智能合约系统。"
+      "summary": " "
     },
     {
       "title": "Cognizant 与 Anthropic 扩大合作，成为 Claude Partner Network 全球首要合作伙伴",
-      "summary": "北京时间:K苹果提出GH-ESD假设驱动错误片段发现方法，该方法针对目标检测与分割的实例级错误切片发现。当前方法难以捕捉由于上下文关系和空间视觉模式导致的实例级失败。GH-ESD通过基于假设的驱动方式系统地发现模型在语义连贯上的文的系统失效。"
+      "summary": ",Kimii P发布一个视觉感知基准Per Bench"
     },
     {
       "title": "Apple 提出 GH-ESD：面向实例级视觉任务的假设驱动错误切片发现方法",
-      "summary": "北京时间:KOpenAI提出GH-ESD方法，为AI技能驱动金融分析智能体构建了新的生成D协作HTML PPT。该模型旨在减少实例级视觉任务中由于图像级分类难以捕捉的由于上下文关系和空间视觉模式导致的实例级失败。"
+      "summary": ",该3个视觉感知能力被拆解为1 10 种原子能力，并并 "
+    },
+    {
+      "title": "",
+      "summary": "%基准构建了32个视觉感知能力 "
+    },
+    {
+      "title": "",
+      "summary": ", 开源的8.8T 参数模型K3已实现6种  1"
+    },
+    {
+      "title": "",
+      "summary": ", K3模型支持基于SGLang和ML MLA交错的混合架构， "
+    },
+    {
+      "title": "",
+      "summary": ",参数模型K3为每单位8 tok/s实现"
+    },
+    {
+      "title": "",
+      "summary": ", DSpark推理模型K3已实现准确率超过83 tok/s。 "
+    },
+    {
+      "title": "",
+      "summary": "\n NVIDIA、 Microsoft等MicrosoftHugging FaceIBM"
+    },
+    {
+      "title": "",
+      "summary": "\n数十N机构联合成立Secure AI Alliance旨在通过开源模型、工具和框架构建审查定制N安安全防御体系。 "
+    },
+    {
+      "title": "",
+      "summary": "\nClaudeD Partner Network是全球全球全球全球全球全球N全球"
+    },
+    {
+      "title": "",
+      "summary": "\nClaudeD Partner Network是基于Global PremierPremN"
+    },
+    {
+      "title": "",
+      "summary": "\n超过超过4万名员工完成Claudee培训其其为一家生生物制药公司构建智能合约系统N"
+    },
+    {
+      "title": "",
+      "summary": "\nApple 机器学习研究团队提出GH-ESD一种针对目标检测检测与分割实例级视觉任务的错误错误切片发现方法。 "
+    },
+    {
+      "title": "",
+      "summary": "\nApple 机器学习研究团队提出GH-ESD一种针对目标检测与分割实例级视觉任务的错误错误切片发现方法。基于假设驱动方式发现模型在语义连贯上的N性失效。"
     }
   ],
-  "leadText": "",
-  "bubbleComment": "",
+  "leadText": "今日今日AI市场整体表现较为低迷，，智谱(港股)跌26.6%%,成为表现最差的个股。点",
+  "bubbleComment": "『AI泡沫是否在逐渐消退，点结合今日美股和韩股AI概念股的表现来看，主要科技巨头股价调整明显 但长期来看AI行业仍具潜力",
   "moduleReviews": {},
   "headline": null,
   "picks": [],
