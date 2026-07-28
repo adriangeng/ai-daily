@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>AI HOT 日报 · 2026-07-28</title>
+<style>
+  :root{
+    --bg:#f3f5fa; --card:#ffffff; --ink:#1b2230; --sub:#5b6677;
+    --line:#e7ebf2; --brand:#3b5bff; --brand2:#7a4dff;
+    --chip:#eef2ff; --chipink:#3b5bff;
+    --s1:#3b5bff; --s2:#00a37a; --s3:#ff8a3d; --s4:#a259ff; --s5:#ff5d8f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{padding:0 14px}
+
+  .hero{
+    background:linear-gradient(135deg,#3b5bff 0%,#7a4dff 100%);
+    color:#fff;padding:30px 0 34px;
+  }
+  .hero .kicker{font-size:12px;letter-spacing:1.5px;opacity:.85}
+  .hero h1{font-size:28px;font-weight:800;margin:4px 0 2px}
+  .hero .date{font-size:17px;font-weight:600;opacity:.95}
+  .hero .meta{margin-top:8px;font-size:12.5px;opacity:.88}
+  .fallback{margin-top:12px;display:inline-block;background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.35);padding:5px 11px;border-radius:999px;font-size:12px}
+  .leadbox{margin-top:14px;background:rgba(255,255,255,.13);border-left:4px solid #fff;
+    border-radius:9px;padding:12px 14px;font-size:14px;line-height:1.7}
+  .leadbox .lt{font-size:11px;letter-spacing:1.5px;opacity:.8;display:block;margin-bottom:5px}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .stat{flex:1 1 28%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+    border-radius:12px;padding:10px 12px;min-width:0}
+  .stat .num{font-size:21px;font-weight:800;line-height:1.1}
+  .stat .lab{font-size:11.5px;opacity:.9;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .total{display:flex;align-items:center;gap:8px;margin-top:16px;
+    background:rgba(255,255,255,.14);border-radius:12px;padding:10px 14px}
+  .total .big{font-size:26px;font-weight:800}
+  .total .t{font-size:13px;opacity:.92}
+
+  .nav{background:#fff;border-bottom:1px solid var(--line);padding:10px 0;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .nav .wrap{display:flex;gap:8px;padding:0 12px}
+  .nav a{font-size:13px;font-weight:600;color:var(--sub);background:#f3f5fa;
+    border:1px solid var(--line);border-radius:999px;padding:7px 13px;display:inline-flex;gap:6px;align-items:center;flex:none}
+  .nav a .c{background:var(--chip);color:var(--chipink);border-radius:999px;
+    font-size:11px;padding:1px 6px;font-weight:700}
+
+  .section{margin:26px 0 6px;scroll-margin-top:8px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .sec-dot{width:10px;height:10px;border-radius:3px;flex:none}
+  .sec-head h2{font-size:19px;font-weight:800}
+  .sec-head .cnt{font-size:12px;color:var(--sub);background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:2px 9px}
+  .grid{display:flex;flex-direction:column;gap:12px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:15px 15px 14px;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(20,30,60,.04)}
+  .c-top{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .badge{flex:none;width:28px;height:28px;border-radius:8px;color:#fff;font-weight:800;
+    font-size:13px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--brand),var(--brand2))}
+  .chip{font-size:11.5px;font-weight:600;color:var(--chipink);background:var(--chip);
+    border-radius:999px;padding:3px 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52%}
+  .ctime{margin-left:auto;font-size:11px;color:var(--sub);flex:none}
+  .card h3{font-size:16.5px;font-weight:700;line-height:1.45;margin-bottom:7px}
+  .card .sum{font-size:14px;color:var(--sub);margin-bottom:11px}
+  .comment{border-left:3px solid var(--brand2);background:#faf9ff;border-radius:0 8px 8px 0;
+    padding:8px 11px;font-size:13px;line-height:1.6;color:#3a2d5c;margin-bottom:12px}
+  .comment .cl{font-weight:800;color:var(--brand2);margin-right:6px}
+  .comment.edit{border-left-color:var(--s3);background:#fff8f1}
+  .comment.edit .cl{color:var(--s3)}
+  .card .go{margin-top:auto;font-size:14.5px;font-weight:700;color:#fff;
+    background:linear-gradient(135deg,var(--brand),var(--brand2));
+    border-radius:11px;padding:11px 14px;display:flex;align-items:center;justify-content:center;gap:6px;
+    min-height:44px}
+
+  .flash-grid .card{border-style:dashed}
+  .sec-flash .sec-dot{background:#94a3b8}
+
+  .sec-stocks .sec-dot{background:var(--s5)}
+  .sec-cap{font-size:12px;color:var(--sub);margin:-6px 0 14px;line-height:1.7}
+  .sec-cap a{color:var(--brand);font-weight:600}
+  .stocks-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .stock-card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:11px 12px;position:relative;overflow:hidden}
+  .stock-card.up{border-top:3px solid #e23c31}
+  .stock-card.down{border-top:3px solid #0a9a52}
+  .sc-top{display:flex;align-items:baseline;gap:5px;margin-bottom:6px;flex-wrap:wrap}
+  .sc-tk{font-weight:800;font-size:13.5px;letter-spacing:.3px}
+  .sc-name{font-size:11.5px;color:var(--sub)}
+  .sc-mkt{margin-left:auto;font-size:10px;font-weight:700;color:#5b6b8c;background:#eef2f9;
+    border:1px solid #dfe6f2;border-radius:999px;padding:1px 6px;white-space:nowrap}
+  .sc-price{font-size:18px;font-weight:800;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;line-height:1.2}
+  .sc-cur{font-size:11.5px;font-weight:700;opacity:.7}
+  .sc-chg{font-size:12px;font-weight:700}
+  .up .sc-price,.up .sc-chg{color:#e23c31}
+  .down .sc-price,.down .sc-chg{color:#0a9a52}
+  .sc-range{font-size:10.5px;color:var(--sub);margin-top:5px}
+  .sc-time{font-size:10px;color:var(--sub);margin-top:3px;opacity:.85}
+  .stocks-empty{grid-column:1/-1;color:var(--sub);font-size:13px;background:#fff;
+    border:1px dashed var(--line);border-radius:12px;padding:16px 18px}
+
+  footer{margin:38px 0 30px;padding-top:20px;border-top:1px solid var(--line);
+    text-align:center;color:var(--sub);font-size:12.5px}
+  footer .ftotal{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  footer a{color:var(--brand);font-weight:600}
+
+  #top{position:fixed;right:16px;bottom:16px;width:42px;height:42px;border-radius:50%;
+    background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border:none;
+    font-size:19px;cursor:pointer;box-shadow:0 6px 18px rgba(60,90,255,.4);
+    opacity:0;pointer-events:none;transition:.25s;z-index:30}
+  #top.show{opacity:1;pointer-events:auto}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="kicker">AI HOT Daily · 中文 AI 资讯晨报</div>
+      <h1>AI HOT 日报</h1>
+      <div class="date" id="heroDate"></div>
+      <div class="meta" id="heroMeta"></div>
+      <div id="fallbackBox"></div>
+      <div class="leadbox" id="leadBox"><span class="lt">今日导读</span><span id="leadText"></span></div>
+      <div class="stats" id="stats"></div>
+      <div class="total">
+        <span class="big" id="totalNum">0</span>
+        <span class="t">条 AI 动态 · 五版块全覆盖</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav"><div class="wrap" id="nav"></div></nav>
+
+  <main class="wrap" id="main"></main>
+
+  <footer>
+    <div class="wrap">
+      <div class="ftotal" id="footTotal"></div>
+      <div>数据来源：<a href="https://aihot.virxact.com" target="_blank" rel="noopener noreferrer">aihot.virxact.com</a>
+        · 本页为离线快照，所有内容以原文为准</div>
+    </div>
+  </footer>
+
+  <button id="top" title="回到顶部">↑</button>
+
+<script>const DATA = {"date":"2026-07-28","isToday":true,"generatedAt":"2026-07-28T00:00:49.292Z","lead":"今日 AI 两极化：Grok CLI、Suno 上新；ChatGPT 被套出“高中生级”制毒指南、Claude Opus 5 提示词遭泄露。开源战升温，OpenAI 求封中国模型、黄仁勋马斯克护开源；8 美元芯片跑模型，AI 从云掉进掌心。","leadTitle":null,"sections":[{"label":"模型发布/更新","items":[{"n":1,"title":"Kimi K3 开源：2.8T MoE 模型与技术报告","summary":"Kimi 发布其最强模型 Kimi K3，这是一个 2.8T 参数的 MoE 模型，具备原生视觉理解和 1M token…","sourceName":"X：Kimi.ai (@Kimi_Moonshot)","sourceUrl":"https://x.com/Kimi_Moonshot/status/2081760186235289764","publishedAt":"2026-07-27T15:14:40.000Z","comment":""},{"n":2,"title":"Kimi K3 上线 Modal，支持无损加速推理","summary":"很高兴 @modal 成为 Kimi K3 的 Day 0 发布合作伙伴！ 他们为 K3 的架构训练了自定义 DFlas…","sourceName":"X：Kimi.ai (@Kimi_Moonshot)","sourceUrl":"https://x.com/Kimi_Moonshot/status/2081767591887122564","publishedAt":"2026-07-27T15:44:05.000Z","comment":""}],"empty":false,"comment":"今日无重磅模型发布，真相是厂商在憋闭源大招、或把弹药排到下月——表面平静实则在排期，别被“今天没新闻”骗了。"},{"label":"产品发布/更新","items":[{"n":3,"title":"Kimi 发布视觉感知基准 PerceptionBench","summary":"Kimi.ai 发布 PerceptionBench，一个从当前前沿模型在 42 个基准上的失败模式中归纳出的视觉感知基…","sourceName":"X：Kimi.ai (@Kimi_Moonshot)","sourceUrl":"https://x.com/Kimi_Moonshot/status/2081813202514681878","publishedAt":"2026-07-27T18:45:20.000Z","comment":""},{"n":4,"title":"SGLang 和 Miles 为月之暗面 2.8T 参数 Kimi K3 模型提供发布当日支持","summary":"SGLang 和 Miles 为月之暗面开源的 2.8T 参数模型 Kimi K3 提供发布当日支持，分别负责推理和 R…","sourceName":"LMSYS：Blog（Chatbot Arena 团队）","sourceUrl":"https://www.lmsys.org/blog/2026-07-27-kimi-k3-day0-support","publishedAt":"2026-07-27T17:50:17.260Z","comment":""}],"empty":false,"comment":""},{"label":"行业动态","items":[{"n":5,"title":"Google AI Overviews 搜索结果出现率升至43%","summary":"Google AI Overviews 在搜索结果中的出现率一年内从15%升至43%，AI Mode月访问量从1.26亿…","sourceName":"TechCrunch：AI（RSS）","sourceUrl":"https://techcrunch.com/2026/07/27/googles-ai-search-is-rapidly-becoming-the-default-new-data-shows","publishedAt":"2026-07-27T15:57:12.000Z","comment":""},{"n":6,"title":"NVIDIA 等多家行业领袖联合成立 Open Secure AI Alliance，推动 AI 安全与防御开源化","summary":"NVIDIA、Microsoft、Hugging Face、IBM 等数十家机构联合成立 Open Secure AI …","sourceName":"NVIDIA Blog（RSS）","sourceUrl":"https://blogs.nvidia.com/blog/open-secure-ai-alliance","publishedAt":"2026-07-27T09:00:07.000Z","comment":""},{"n":7,"title":"Cognizant 与 Anthropic 扩大合作，成为 Claude Partner Network 全球首要合作伙伴","summary":"Cognizant 与 Anthropic 扩大合作，成为 Claude Partner Network 中的 Glob…","sourceName":"Anthropic：Newsroom（网页）","sourceUrl":"https://www.anthropic.com/news/cognizant-anthropic","publishedAt":null,"comment":""}],"empty":false,"comment":""},{"label":"论文研究","items":[{"n":8,"title":"Apple 提出 GH-ESD：面向实例级视觉任务的假设驱动错误切片发现方法","summary":"Apple 机器学习研究团队提出 GH-ESD（Grounded Hypothesis-Driven Error Sli…","sourceName":"Apple Machine Learning Research（RSS）","sourceUrl":"https://machinelearning.apple.com/research/gh-esd","publishedAt":null,"comment":""}],"empty":false,"comment":"今日无顶会级论文进简报，不是没人发，而是能被社区挑出来、值得精读的还没冒头——热闹在产线，不在 arXiv。"},{"label":"技巧与观点","items":[{"n":9,"title":"用AI Skill自动生成可协作HTML PPT","summary":"Vista 基于 bento PPT 改造了一个 Skill，输入内容或主题即可自动生成可编辑、在线演示并支持协作的 H…","sourceName":"X：Vista (@vista8)","sourceUrl":"https://x.com/vista8/status/2081568902241513786","publishedAt":"2026-07-27T02:34:34.000Z","comment":""},{"n":10,"title":"GitHub Copilot 发布“Harness”工作流：用单一工具完成原型、规划、实现与代码审查","summary":"GitHub Copilot 推出“Harness”工作流，让开发者通过单一 AI 工具完成从原型设计、规划、实现到代码…","sourceName":"GitHub Blog","sourceUrl":"https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly","publishedAt":null,"comment":""},{"n":11,"title":"用Claude和Python构建技能驱动的金融分析智能体","summary":"本教程基于Anthropic的financial-services仓库，用纯Python复现其技能驱动架构。通过解析SK…","sourceName":"MarkTechPost（RSS）","sourceUrl":"https://www.marktechpost.com/2026/07/27/designing-skill-driven-financial-analysis-agents-with-claude-python-mcp-connectors-and-automated-deliverables","publishedAt":"2026-07-27T18:08:24.000Z","comment":""},{"n":12,"title":"OpenAI 称越来越多员工用 ChatGPT 做其他岗位的工作","summary":"OpenAI 分析超 80 万条与工作相关的 ChatGPT 消息后发现，43.5% 的岗位特定查询涉及另一职业，营销和…","sourceName":"The Decoder：AI News（RSS）","sourceUrl":"https://the-decoder.com/openai-says-more-workers-are-using-chatgpt-to-do-other-peoples-jobs","publishedAt":"2026-07-27T19:08:51.000Z","comment":""},{"n":13,"title":"GitHub Copilot app 入门指南：多 Agent 会话工作区与 Canvas 预览","summary":"GitHub Copilot app 将 AI 编码工具升级为多 Agent 会话工作区，支持同时管理多个任务线程而不丢…","sourceName":"GitHub Blog","sourceUrl":"https://github.blog/ai-and-ml/github-copilot/github-copilot-app-for-beginners-getting-started","publishedAt":"2026-07-27T16:00:00.000Z","comment":""},{"n":14,"title":"浪费20亿Token后，我开源了帮Agent定义目标的Leader.skill","summary":"作者开源了Leader.skill，用于将模糊的人类需求转化为Agent可独立执行数小时的目标任务书。该Skill基于“…","sourceName":"公众号：数字生命卡兹克","sourceUrl":"https://mp.weixin.qq.com/s/AwOk3di8m6eVeIUjzNftgg","publishedAt":"2026-07-27T00:12:00.000Z","comment":""},{"n":15,"title":"Anthropic 澄清立场：从未主张全面禁止开源权重模型，支持芯片出口管制与安全测试","summary":"Anthropic CEO Dario Amodei 明确表示公司从未主张禁止开源权重模型，并认为不具备危险能力的开源权…","sourceName":"Anthropic：Newsroom（网页）","sourceUrl":"https://www.anthropic.com/news/position-open-weights-models","publishedAt":"2026-07-27T22:26:00.307Z","comment":""},{"n":16,"title":"OpenRouter 新增图像生成模型专用 API 端点","summary":"OpenRouter 通过专用 `/api/v1/images` 端点提供图像生成模型服务，图像理解仍通过 `/chat…","sourceName":"OpenRouter：Announcements（RSS）","sourceUrl":"https://openrouter.ai/blog/tutorials/image-generation-models","publishedAt":null,"comment":""}],"empty":false,"comment":""}],"flashes":[],"total":16,"sectionStats":[{"label":"模型发布/更新","count":2},{"label":"产品发布/更新","count":2},{"label":"行业动态","count":3},{"label":"论文研究","count":1},{"label":"技巧与观点","count":8}],"source":"aihot.virxact.com","stocks":[{"t":"NVDA","name":"英伟达","mkt":"us","mktLabel":"美股","price":196.51,"prev":206.84,"change":-10.330000000000013,"changePct":-4.99419841423323,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":208.75,"dayLow":195.44},{"t":"MSFT","name":"微软","mkt":"us","mktLabel":"美股","price":389.1,"prev":381.7,"change":7.400000000000034,"changePct":1.9386953104532443,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":394.2,"dayLow":387.99},{"t":"GOOGL","name":"谷歌","mkt":"us","mktLabel":"美股","price":326.56,"prev":319.74,"change":6.819999999999993,"changePct":2.1329830487270884,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":330.42,"dayLow":324.45},{"t":"META","name":"Meta","mkt":"us","mktLabel":"美股","price":593.87,"prev":595.19,"change":-1.32000000000005,"changePct":-0.22177791965591656,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":611.26,"dayLow":593.13},{"t":"AMD","name":"AMD","mkt":"us","mktLabel":"美股","price":494.95,"prev":521.95,"change":-27.000000000000057,"changePct":-5.172909282498335,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":528,"dayLow":476.93},{"t":"AVGO","name":"博通","mkt":"us","mktLabel":"美股","price":383.22,"prev":381.92,"change":1.3000000000000114,"changePct":0.3403854210305853,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":389.9,"dayLow":373.5},{"t":"PLTR","name":"Palantir","mkt":"us","mktLabel":"美股","price":131.53,"prev":122.92,"change":8.61,"changePct":7.004555808656036,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":132.41,"dayLow":125.31},{"t":"TSM","name":"台积电","mkt":"us","mktLabel":"美股","price":399.09,"prev":403.41,"change":-4.32000000000005,"changePct":-1.0708708262066011,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:04","dayHigh":407.43,"dayLow":388.8},{"t":"TSLA","name":"特斯拉","mkt":"us","mktLabel":"美股","price":309.22,"prev":313.03,"change":-3.8099999999999454,"changePct":-1.217135737788693,"currency":"USD","sym":"$","bjTime":"7月28日 周二 04:00","dayHigh":317,"dayLow":304.28},{"t":"005930","name":"三星电子","mkt":"kr","mktLabel":"韩股","price":231000,"prev":254000,"change":-23000,"changePct":-9.05511811023622,"currency":"KRW","sym":"₩","bjTime":"7月28日 周二 08:04","dayHigh":240000,"dayLow":230000},{"t":"000660","name":"SK海力士","mkt":"kr","mktLabel":"韩股","price":1624000,"prev":1816000,"change":-192000,"changePct":-10.572687224669604,"currency":"KRW","sym":"₩","bjTime":"7月28日 周二 08:04","dayHigh":1674000,"dayLow":1615000},{"t":"02513","name":"智谱","mkt":"hk","mktLabel":"港股","price":1231,"prev":1281,"change":-50,"changePct":-3.9032006245121003,"currency":"HKD","sym":"HK$","bjTime":"7月28日 周二 09:14","dayHigh":0,"dayLow":0}],"stockSource":"腾讯自选股"};
+const WK = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+const pad = n => String(n).padStart(2,'0');
+
+function fmtDateHuman(ds){
+  const [y,m,d] = ds.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m-1, d));
+  return y + '年' + m + '月' + d + '日 ' + WK[dt.getUTCDay()];
+}
+function fmtBJ(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  const bj = new Date(d.getTime() + 8*3600*1000);
+  const M = bj.getUTCMonth()+1, D = bj.getUTCDate();
+  const now = new Date(Date.now()+8*3600*1000);
+  const tM = now.getUTCMonth()+1, tD = now.getUTCDate();
+  let prefix;
+  if(M===tM && D===tD) prefix='今天';
+  else if(M===tM && D===tD-1) prefix='昨天';
+  else prefix = M + '月' + D + '日';
+  return prefix + ' ' + pad(bj.getUTCHours()) + ':' + pad(bj.getUTCMinutes());
+}
+
+// HERO
+document.getElementById('heroDate').textContent = fmtDateHuman(DATA.date);
+document.getElementById('heroMeta').textContent =
+  '每日北京时间 08:00 自动生成 · 数据来源 ' + DATA.source;
+if(DATA.lead){
+  document.getElementById('leadText').textContent = DATA.lead;
+} else {
+  document.getElementById('leadBox').style.display = 'none';
+}
+document.getElementById('totalNum').textContent = DATA.total;
+
+if(!DATA.isToday){
+  const fb = document.getElementById('fallbackBox');
+  fb.className = 'fallback';
+  fb.textContent = '⚠ 当日日报尚未生成，已回退至最近一期（' + DATA.date + '）';
+}
+
+// STATS
+const statsEl = document.getElementById('stats');
+DATA.sectionStats.forEach(function(s,i){
+  const c = ['var(--s1)','var(--s2)','var(--s3)','var(--s4)','var(--s5)'][i];
+  const el = document.createElement('div');
+  el.className = 'stat';
+  el.innerHTML = '<div class="num" style="color:#fff">' + s.count + '</div><div class="lab">' + s.label + '</div>';
+  statsEl.appendChild(el);
+});
+
+// NAV
+const navEl = document.getElementById('nav');
+DATA.sections.forEach(function(s,i){
+  const a = document.createElement('a');
+  a.href = '#sec-' + i;
+  a.innerHTML = s.label + '<span class="c">' + s.items.length + '</span>';
+  navEl.appendChild(a);
+});
+if(DATA.stocks && DATA.stocks.length){
+  const a = document.createElement('a');
+  a.href = '#sec-stocks';
+  a.innerHTML = 'AI 概念股<span class="c">' + DATA.stocks.length + '</span>';
+  navEl.appendChild(a);
+}
+
+// SECTIONS + CARDS
+const main = document.getElementById('main');
+DATA.sections.forEach(function(s,i){
+  const sec = document.createElement('section');
+  sec.className = 'section';
+  sec.id = 'sec-' + i;
+  const dot = ['var(--s1)','var(--s2)','var(--s3)','var(--s4)','var(--s5)'][i];
+  sec.innerHTML =
+    '<div class="sec-head">' +
+      '<span class="sec-dot" style="background:' + dot + '"></span>' +
+      '<h2>' + s.label + '</h2>' +
+      '<span class="cnt">' + s.items.length + ' 条</span>' +
+    '</div><div class="grid"></div>';
+  const grid = sec.querySelector('.grid');
+  if(s.empty){
+    grid.innerHTML = '<div style="grid-column:1/-1;color:var(--sub);font-size:13.5px;' +
+      'background:#fff;border:1px dashed var(--line);border-radius:14px;padding:18px 20px">' +
+      '今日该版块暂无入选内容</div>';
+  }
+  if(s.comment){
+    const note = document.createElement('div');
+    note.className = 'comment edit';
+    note.style.gridColumn = '1/-1';
+    note.style.marginTop = '0';
+    note.innerHTML = '<span class="cl">编辑点评</span>' + s.comment;
+    grid.appendChild(note);
+  }
+  s.items.forEach(function(it){
+    const card = document.createElement('article');
+    card.className = 'card';
+    const time = fmtBJ(it.publishedAt);
+    card.innerHTML =
+      '<div class="c-top">' +
+        '<span class="badge">' + it.n + '</span>' +
+        '<span class="chip" title="' + it.sourceName.replace(/"/g,'&quot;') + '">' + it.sourceName + '</span>' +
+        (time ? '<span class="ctime">' + time + '</span>' : '') +
+      '</div>' +
+      '<h3>' + it.title + '</h3>' +
+      '<p class="sum">' + it.summary + '</p>' +
+      (it.comment ? '<div class="comment"><span class="cl">辣评</span>' + it.comment + '</div>' : '') +
+      '<a class="go" href="' + it.sourceUrl + '" target="_blank" rel="noopener noreferrer">查看原文</a>';
+    grid.appendChild(card);
+  });
+  main.appendChild(sec);
+});
+
+// STOCKS MODULE (AI-related companies, multi-market)
+if(DATA.stocks && DATA.stocks.length){
+  const sec = document.createElement('section');
+  sec.className = 'section sec-stocks';
+  sec.id = 'sec-stocks';
+  sec.innerHTML =
+    '<div class="sec-head">' +
+      '<span class="sec-dot"></span>' +
+      '<h2>AI 概念股</h2>' +
+      '<span class="cnt">' + DATA.stocks.length + ' 只</span>' +
+    '</div>' +
+    '<div class="sec-cap">各市场收盘 / 盘中快照 · 来源 <a href="https://gu.qq.com/" target="_blank" rel="noopener noreferrer">' + (DATA.stockSource || '') + '</a>' +
+      ' · 红涨绿跌 · 数据仅供参考，不构成投资建议</div>' +
+    '<div class="stocks-grid"></div>';
+  const grid = sec.querySelector('.stocks-grid');
+  DATA.stocks.forEach(function(q){
+    const up = q.change >= 0;
+    const card = document.createElement('div');
+    card.className = 'stock-card ' + (up ? 'up' : 'down');
+    const arrow = up ? '▲' : '▼';
+    const sign = up ? '+' : '';
+    const rng = (q.dayLow != null && q.dayHigh != null)
+      ? ('今日 ' + q.sym + q.dayLow.toFixed(2) + '–' + q.dayHigh.toFixed(2))
+      : '';
+    card.innerHTML =
+      '<div class="sc-top"><span class="sc-tk">' + q.t + '</span>' +
+        '<span class="sc-name">' + q.name + '</span>' +
+        '<span class="sc-mkt">' + q.mktLabel + '</span></div>' +
+      '<div class="sc-price"><span class="sc-cur">' + q.sym + '</span>' + q.price.toFixed(2) +
+        ' <span class="sc-chg">' + arrow + ' ' + sign + q.change.toFixed(2) +
+        ' (' + sign + q.changePct.toFixed(2) + '%)</span></div>' +
+      (rng ? '<div class="sc-range">' + rng + '</div>' : '') +
+      '<div class="sc-time">更新 ' + (q.bjTime || '') + '（北京时间）</div>';
+    grid.appendChild(card);
+  });
+  main.appendChild(sec);
+}
+
+// FLASHES (bonus)
+if(DATA.flashes && DATA.flashes.length){
+  const sec = document.createElement('section');
+  sec.className = 'section sec-flash';
+  sec.id = 'sec-flashes';
+  sec.innerHTML =
+    '<div class="sec-head">' +
+      '<span class="sec-dot"></span>' +
+      '<h2>快讯</h2>' +
+      '<span class="cnt">' + DATA.flashes.length + ' 条</span>' +
+    '</div><div class="grid flash-grid"></div>';
+  const grid = sec.querySelector('.grid');
+  DATA.flashes.forEach(function(it){
+    const card = document.createElement('article');
+    card.className = 'card';
+    const time = fmtBJ(it.publishedAt);
+    card.innerHTML =
+      '<div class="c-top">' +
+        '<span class="badge">' + it.n + '</span>' +
+        '<span class="chip" title="' + it.sourceName.replace(/"/g,'&quot;') + '">' + it.sourceName + '</span>' +
+        (time ? '<span class="ctime">' + time + '</span>' : '') +
+      '</div>' +
+      '<h3>' + it.title + '</h3>' +
+      '<p class="sum">' + it.summary + '</p>' +
+      (it.comment ? '<div class="comment"><span class="cl">辣评</span>' + it.comment + '</div>' : '') +
+      '<a class="go" href="' + it.sourceUrl + '" target="_blank" rel="noopener noreferrer">查看原文</a>';
+    grid.appendChild(card);
+  });
+  main.appendChild(sec);
+}
+
+// FOOTER
+document.getElementById('footTotal').textContent = '本日报共 ' + DATA.total + ' 条 AI 动态';
+
+// back to top
+const topBtn = document.getElementById('top');
+window.addEventListener('scroll', function(){
+  topBtn.classList.toggle('show', window.scrollY > 500);
+});
+topBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+
+</script>
+</body>
+</html>
