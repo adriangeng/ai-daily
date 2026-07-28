@@ -112,6 +112,7 @@ DATA.modules.forEach(function(s,i){
       '<div class="c-top">' +
         '<span class="badge">' + it.n + '</span>' +
         '<span class="chip" title="' + it.sourceName.replace(/"/g,'&quot;') + '">' + it.sourceName + '</span>' +
+        (it.isWeChat ? '<span class="chip wx" style="background:#07c160;color:#fff">💬 公众号</span>' : '') +
         (time ? '<span class="ctime">' + time + '</span>' : '') +
       '</div>' +
       '<h3>' + it.title + '</h3>' +
@@ -181,6 +182,7 @@ if(DATA.flashes && DATA.flashes.length){
       '<div class="c-top">' +
         '<span class="badge">' + it.n + '</span>' +
         '<span class="chip" title="' + it.sourceName.replace(/"/g,'&quot;') + '">' + it.sourceName + '</span>' +
+        (it.isWeChat ? '<span class="chip wx" style="background:#07c160;color:#fff">💬 公众号</span>' : '') +
         (time ? '<span class="ctime">' + time + '</span>' : '') +
       '</div>' +
       '<h3>' + it.title + '</h3>' +
