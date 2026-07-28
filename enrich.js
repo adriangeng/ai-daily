@@ -12,7 +12,7 @@ const path = require('path');
 const ROOT = __dirname;
 
 const API_KEY = process.env.LLM_API_KEY;
-const MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
+const MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-14B-Instruct';
 if (!API_KEY) {
   console.log('[enrich] 未配置 LLM_API_KEY，跳过 AI 增强（网页/推送将使用规则版）');
   process.exit(0);
@@ -191,7 +191,7 @@ async function genHeadline() {
   for (let i = 0; i < expandItems.length; i += CHUNK) {
     const chunk = expandItems.slice(i, i + CHUNK);
     const part = await expandChunk(chunk, i / CHUNK, Math.ceil(expandItems.length / CHUNK));
-    out.expanded.push(...part);
+    out.expanded.push(...part.slice(0, chunk.length));
   }
 
   const [reviews, leadBubble, headline] = await Promise.all([
