@@ -47,7 +47,7 @@ const secEmoji = { '模型发布/更新': '🤖', '产品发布/更新': '📦',
 const secLine = sum.sectionStats.map((s) => `${secEmoji[s.label] || '•'} ${s.label} ${s.count}`).join(' ｜ ');
 
 const link = shareLink || '（未提供链接）';
-const title = `🦞 AI HOT 日报 · ${sum.date}`;
+const title = `🦞 AI HOT 日报 FOR ADRIAN · ${sum.date}`;
 
 // 头条 + 精选（来自 AI 点评）
 let highlight = '';
