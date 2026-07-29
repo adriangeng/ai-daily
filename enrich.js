@@ -59,6 +59,13 @@ function stripJSON(txt) {
   const m = txt.match(/\{[\s\S]*\}/);
   return m ? m[0] : txt;
 }
+// 清洗扩写摘要里可能泄漏的「第N条扩写摘要」类前缀（模型照搬示例所致）
+function stripSummaryPrefix(s) {
+  return (s || '')
+    .replace(/^第[0-9]+条[扩写摘要]*[（(][^）)]*[）)]?\s*/, '')
+    .replace(/^第[0-9]+条[扩写摘要]*[：:：]?\s*/, '')
+    .trim();
+}
 async function callLLM(system, user, maxTokens) {
   const r = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
     method: 'POST',
@@ -103,12 +110,14 @@ async function expandChunk(chunk, idx, total) {
   const user =
     `今天是 ${sum.date}。下面有 ${chunk.length} 条新闻（标题+原摘要），是第 ${idx + 1}/${total} 批。` +
     `请为每条把「原摘要」扩写到 130–170 字（中文），补全背景、影响与看点，保持客观，不要编造原文未提及的具体数字或结论。` +
+    `每条直接输出扩写后的摘要正文，不要加「第N条」「扩写摘要」等序号或前缀。` +
     `严格按输入顺序输出字符串数组，不要遗漏、不要合并。\n\n` +
     chunk.map((it, i) => `${i + 1}. 标题:${it.title}\n   原摘要:${it.summary}`).join('\n') +
-    `\n\n请只输出 JSON：\n{ "summaries": ["第1条扩写摘要(120-160字)","第2条扩写摘要", ...] }`;
+    `\n\n请只输出 JSON：\n{ "summaries": ["第1条新闻扩写后的摘要正文", "第2条新闻扩写后的摘要正文", ...] }`;
   const d = await callLLMRetry(sysExpand, user, 4096, '扩写摘要批' + (idx + 1));
   const arr = d && Array.isArray(d.summaries) ? d.summaries : [];
-  return arr.map((s, i) => ({ title: chunk[i] ? chunk[i].title : '', summary: s || '' }));
+  const cleaned = arr.map((s) => stripSummaryPrefix(s));
+  return cleaned.map((s, i) => ({ title: chunk[i] ? chunk[i].title : '', summary: s || '' }));
 }
 
 // ---- Call 2a：4 模块辣评（小 JSON） ----
