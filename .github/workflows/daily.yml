@@ -2,8 +2,11 @@ name: AI HOT Daily
 
 on:
   schedule:
-    # UTC 22:00 = 北京时间次日 06:00
-    - cron: "0 22 * * *"
+    # 上游 aihot 每日北京时间 08:00 才生成当日日报；
+    # 跑太早只能拿到前一天数据。故定于 UTC 00:30 = 北京时间 08:30（含 GitHub 抖动余量）。
+    - cron: "30 0 * * *"
+  push:
+    branches: [main]
   workflow_dispatch: {}
 
 permissions:
