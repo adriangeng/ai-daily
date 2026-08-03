@@ -1,0 +1,58 @@
+name: Calcio News Briefing
+
+on:
+  schedule:
+    # 北京时间 06:00 / 12:00 / 18:00 / 22:00
+    # = UTC 22:00(前日) / 04:00 / 10:00 / 14:00
+    - cron: "0 22,4,10,14 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: calcio-briefing
+  cancel-in-progress: false
+
+jobs:
+  calcio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Fetch RSS + 生成晨报
+        working-directory: calcio
+        run: |
+          python fetch_rss.py > calcio_raw.json 2>fetch_err.log || echo "fetch 部分失败，继续"
+          echo "--- fetch_err(head) ---"; head -5 fetch_err.log || true
+          # 完整版(留存 artifact，量大)
+          python build_briefing.py calcio_raw.json calcio_briefing_full.md --inter 22 --team 6 --other 6 --body-len 320
+          # 推送版(紧凑，防 pushplus 截断)
+          python build_briefing.py calcio_raw.json calcio_briefing_latest.md --inter 14 --team 4 --other 3 --body-len 160 --no-links
+
+      - name: 上传完整版 Artifact (调试/留存)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calcio-briefing-full
+          path: calcio/calcio_briefing_full.md
+          retention-days: 7
+
+      - name: 推送至 pushplus (微信)
+        continue-on-error: true
+        env:
+          PUSH_CONFIG_JSON: ${{ secrets.PUSH_CONFIG_JSON }}
+        working-directory: calcio
+        run: |
+          if [ -z "$PUSH_CONFIG_JSON" ]; then
+            echo "PUSH_CONFIG_JSON 未配置，跳过推送"
+            exit 0
+          fi
+          printf '%s' "$PUSH_CONFIG_JSON" > .push_config.json
+          python push_calcio.py calcio_briefing_latest.md "欧洲足坛转会晨报 $(TZ=Asia/Shanghai date +%Y-%m-%d\ %H:%M)"
