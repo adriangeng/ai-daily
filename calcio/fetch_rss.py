@@ -131,6 +131,12 @@ TIER_RULES = [
     ("弱传闻", re.compile(r"\b(potrebbe|ipotizza|ipotetico|voce|rumour|rumor|si parla|emerso|secondo|sonderebbe|pista remota|sussurro|could|might|reportedly|speculation|whispers|touted)\b", re.I)),
 ]
 
+# ——————————————————————————————————————————————
+# 语言策略：所有语种源（英/西/德/法/意）均保留，不按语言丢弃条目；
+# 非中/非英标题在 build 阶段由免费翻译 API（MyMemory/Google）统一翻成简中，
+# 故 fetch 阶段无需任何语言检测，也不引入任何付费翻译依赖。
+# ——————————————————————————————————————————————
+
 # Google News RSS 聚合查询（关键词 → 联赛提示）
 GN_LEAGUE_QUERIES = [
     ("意甲 转会", "Serie A transfer", "意甲"),
@@ -300,6 +306,10 @@ def main():
     ap.add_argument("--deep-per-team", type=int, default=2)
     ap.add_argument("--deep-team-cap", type=int, default=24, help="--deep 全文抓取总数上限(控时)")
     ap.add_argument("--body-limit", type=int, default=1400)
+    ap.add_argument("--keep-italian", action="store_true",
+                    help="（保留参数以兼容历史调用；现已统一由免费翻译 API 处理，不再按语言丢弃）")
+    ap.add_argument("--no-body", action="store_true",
+                    help="不抓正文全文(云端推送版用：仅翻译标题以省翻译额度，正文不出现原文)")
     args = ap.parse_args()
 
     now = datetime.now(timezone.utc)
@@ -354,6 +364,7 @@ def main():
         if not fresh:
             dropped_old += 1
             continue
+        # 所有语种条目均保留（含意大利文），翻译在 build 阶段由免费 API 统一处理
         if it.get("kind") == "gn":
             lg = it.get("league_hint") or classify_league(text_title_sum)
         else:
@@ -384,10 +395,11 @@ def main():
 
     inter_items = [i for i in items if i["is_inter"]]
     noninter = [i for i in items if not i["is_inter"]]
-    for it in inter_items:
-        b = get_body(it["link"])
-        it["body"] = b[:args.body_limit]
-        time.sleep(0.2)
+    if not args.no_body:
+        for it in inter_items:
+            b = get_body(it["link"])
+            it["body"] = b[:args.body_limit]
+            time.sleep(0.2)
     if args.deep:
         by_team = defaultdict(list)
         for it in noninter:
@@ -397,16 +409,17 @@ def main():
         for t, lst in by_team.items():
             for it in lst[:args.deep_per_team]:
                 if cnt >= args.deep_team_cap: break
-                b = get_body(it["link"])
-                it["body"] = b[:args.body_limit]
-                time.sleep(0.18)
+                if not args.no_body:
+                    b = get_body(it["link"])
+                    it["body"] = b[:args.body_limit]
+                    time.sleep(0.18)
                 cnt += 1
             if cnt >= args.deep_team_cap: break
 
     for it in items:
         blob = it["title"] + " " + it["summary"] + " " + it["body"]
         it["tier_hint"] = classify_tier(blob)
-        it.pop("kind", None); it.pop("lang", None)
+        it.pop("kind", None)  # 保留 lang 字段，供 build_briefing / 诊断使用
 
     # —— 全局去重：国米独立保留；其余跨源按标题相似度合并 ——
     final = list(inter_items)

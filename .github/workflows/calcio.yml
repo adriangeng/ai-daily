@@ -29,7 +29,7 @@ jobs:
       - name: Fetch RSS + 生成晨报
         working-directory: calcio
         run: |
-          python fetch_rss.py > calcio_raw.json 2>fetch_err.log || echo "fetch 部分失败，继续"
+          python fetch_rss.py --no-body > calcio_raw.json 2>fetch_err.log || echo "fetch 部分失败，继续"
           echo "--- fetch_err(head) ---"; head -5 fetch_err.log || true
           # 完整版(留存 artifact，量大)
           python build_briefing.py calcio_raw.json calcio_briefing_full.md --inter 22 --team 6 --other 6 --body-len 320

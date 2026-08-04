@@ -3,11 +3,15 @@
 """
 build_briefing.py — 将 fetch_rss.py 输出的 JSON 渲染为 markdown 晨报
 结构：🔵国米置顶(全文) + ⚽意甲/英超/西甲/德甲/法甲 重点球队分组(每队按4档)
-纯 Python，无 LLM 依赖，可在 GitHub Actions 运行。
+纯 Python，无外部翻译服务依赖，可在 GitHub Actions 运行。
 用法：python build_briefing.py <input.json> [output.md]
 """
-import json, sys, os
+import json, sys, os, re
 from collections import defaultdict
+
+# 翻译模块（免费免密钥翻译 API：MyMemory + Google gtx；始终启用，失败则保留原文）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import translate
 
 TIER_MARK = {"已官宣": "✅", "强传闻": "🟢", "传闻": "🟡", "弱传闻": "🔴"}
 
@@ -24,7 +28,7 @@ TEAMS_ORDER = {
 def render_item(i, with_body=False, body_len=220, no_links=False):
     tier = i.get("tier_hint", "弱传闻")
     mark = TIER_MARK.get(tier, "🔴")
-    t = (i.get("title") or "").strip()
+    t = (i.get("title_zh") or i.get("title") or "").strip()
     if not t:
         return None
     src = i.get("source", "")
@@ -58,6 +62,9 @@ def main():
     inp, outp = args.inp, args.outp
     d = json.load(open(inp, encoding="utf-8"))
     items = d.get("items", [])
+    # 免费翻译：将非中/英标题(意/西/德/法)翻成简中；无网络或失败则保留原文
+    if translate.enabled():
+        translate.translate_items(items)
     inter = [i for i in items if i.get("is_inter")]
     non = [i for i in items if not i.get("is_inter")]
 
@@ -135,7 +142,7 @@ def main():
             L.append("")
 
     L.append("---")
-    L.append("*数据来源：意甲 RSS 全文 + Google News 全球聚合 + 英/西/德/法 RSS（数据本地解析）。RSS 滞后约 0.5–数小时，官宣以俱乐部官方为准。本简报仅为公开新闻聚合，不构成投注或交易建议。*")
+    L.append("*数据来源：Google News 全球聚合（按联赛/俱乐部关键词）+ 英语/西/德/法/意 RSS 五大联赛直连源。**意/西/德/法标题由免费翻译 API 自动译为简体中文**（意/西/德/法源原文不再出现）。RSS 滞后约 0.5–数小时，官宣以俱乐部官方为准。本简报仅为公开新闻聚合，不构成投注或交易建议。*")
 
     out = "\n".join(L)
     with open(outp, "w", encoding="utf-8") as f:
