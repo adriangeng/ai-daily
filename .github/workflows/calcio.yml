@@ -34,7 +34,7 @@ jobs:
           # 完整版(留存 artifact，量大)
           python build_briefing.py calcio_raw.json calcio_briefing_full.md --inter 22 --team 6 --other 6 --body-len 320
           # 推送版(紧凑，防 pushplus 截断)
-          python build_briefing.py calcio_raw.json calcio_briefing_latest.md --inter 14 --team 4 --other 3 --body-len 160 --no-links
+          python build_briefing.py calcio_raw.json calcio_briefing_latest.md --inter 10 --team 3 --other 2 --body-len 120 --no-links
 
       - name: 上传完整版 Artifact (调试/留存)
         if: always()

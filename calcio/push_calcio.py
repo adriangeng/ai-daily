@@ -51,6 +51,12 @@ def main():
         print("[pushplus] 读取文件失败:", e)
         sys.exit(1)
 
+    # pushplus 免费版单次内容上限 2 万字，超出会被服务端拒收(code=999 发送内容过大)
+    # 硬截断兜底：留 1000 字余量，超限截断并提示，确保推送永远不被长度拒收
+    if len(content) > 19000:
+        print(f"[pushplus] ⚠️ 内容 {len(content)} 字接近 pushplus 上限，截断到 19000 字")
+        content = content[:19000] + "\n\n…（内容过长已截断，完整版见仓库 artifact）"
+
     payload = {
         "token": token,
         "title": title,
